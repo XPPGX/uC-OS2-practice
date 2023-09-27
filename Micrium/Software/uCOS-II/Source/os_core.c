@@ -958,6 +958,12 @@ void  OSTimeTick (void)
     OS_EXIT_CRITICAL();
 #endif
     if (OSRunning == OS_TRUE) {
+        /*Setting the end time for the OS*/
+        if (OSTimeGet() > SYSTEM_END_TIME) {
+            OSRunning = OS_FALSE;
+            exit(0);
+        }
+        /*Setting the end time for the OS*/
 #if OS_TICK_STEP_EN > 0u
         switch (OSTickStepState) {                         /* Determine whether we need to process a tick  */
             case OS_TICK_STEP_DIS:                         /* Yes, stepping is disabled                    */

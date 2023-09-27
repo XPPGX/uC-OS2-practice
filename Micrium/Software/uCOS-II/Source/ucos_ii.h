@@ -55,11 +55,46 @@ extern "C" {
 #include <os_cpu.h>
 #include "os_trace.h"
 
+/*read file*/
+#include <string.h>
 /*
 *********************************************************************************************************
 *                                            MISCELLANEOUS
 *********************************************************************************************************
 */
+/*End time for the simulation*/
+#define SYSTEM_END_TIME 30
+/*Input File*/
+    FILE* fp;
+#define INPUT_FILE_NAME "./TaskSet.txt"
+#define OUTPUT_FILE_NAME "./Output.txt"
+#define MAX 20              //Task maximum number
+#define INFO 4              //information of task
+/*Input File*/
+
+/*Output File*/
+    FILE* Output_fp;
+    errno_t Output_err;
+/*Output File*/
+
+/*Task structure*/
+typedef struct task_para_set {
+    INT16U TaskID;
+    INT16U TaskArriveTime;
+    INT16U TaskExecutionTime;
+    INT16U TaskPeriodic;
+    INT16U TaskNumber;
+    INT16U TaskPriority;
+}task_para_set;
+
+int TASK_NUMBER; //Number of the input tasks
+/*Task structure*/
+
+/*Dynamic Create the Stack size*/
+OS_STK** Task_STK;
+
+/*Create Task*/
+task_para_set TaskParameter[OS_MAX_TASKS];
 
 #ifdef   OS_GLOBALS
 #define  OS_EXT
@@ -1467,6 +1502,10 @@ void          OSCtxSw                 (void);
 #endif
 
 
+
+
+void OutFileInit(void);
+void InputFile(void);
 /*
 *********************************************************************************************************
 *                                   LOOK FOR MISSING #define CONSTANTS

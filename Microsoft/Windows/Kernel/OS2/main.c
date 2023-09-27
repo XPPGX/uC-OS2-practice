@@ -54,6 +54,7 @@
 *********************************************************************************************************
 */
 
+#define TASK_STACKSIZE 2048
 static  OS_STK  StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE];
 
 
@@ -62,7 +63,8 @@ static  OS_STK  StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE];
 *                                         FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
-
+static void task1(void* p_arg);
+static void task2(void* p_arg);
 static  void  StartupTask (void  *p_arg);
 
 
@@ -95,23 +97,55 @@ int  main (void)
     CPU_Init();                                                 /* Initialize the uC/CPU services                       */
 
     OSInit();                                                   /* Initialize uC/OS-II                                  */
+    /*Initialize Output File*/
+    OutFileInit();
+    /*Input File*/
+    InputFile();
 
-    OSTaskCreateExt( StartupTask,                               /* Create the startup task                              */
-                     0,
-                    &StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE - 1u],
-                     APP_CFG_STARTUP_TASK_PRIO,
-                     APP_CFG_STARTUP_TASK_PRIO,
-                    &StartupTaskStk[0u],
-                     APP_CFG_STARTUP_TASK_STK_SIZE,
-                     0u,
-                    (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+    /*Dynamic Create the Stack size*/
+    Task_STK = malloc(TASK_NUMBER * sizeof(int*));
+    /*for each pointer, allocate storage for an array of ints*/
+    int n;
+    for (n = 0; n < TASK_NUMBER; n++) {
+        Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
+    }
+    OSTaskCreateExt(task1,
+        &TaskParameter[0],
+        &Task_STK[0][TASK_STACKSIZE - 1],
+        TaskParameter[0].TaskPriority,
+        TaskParameter[0].TaskID,
+        &Task_STK[0][0],
+        TASK_STACKSIZE,
+        &TaskParameter[0],
+        (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
-#if OS_TASK_NAME_EN > 0u
-    OSTaskNameSet(         APP_CFG_STARTUP_TASK_PRIO,
-                  (INT8U *)"Startup Task",
-                           &os_err);
-#endif
+    OSTaskCreateExt(task2,
+        &TaskParameter[1],
+        &Task_STK[1][TASK_STACKSIZE - 1],
+        TaskParameter[1].TaskPriority,
+        TaskParameter[1].TaskID,
+        &Task_STK[1][0],
+        TASK_STACKSIZE,
+        &TaskParameter[1],
+        (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+//    OSTaskCreateExt( StartupTask,                               /* Create the startup task                              */
+//                     0,
+//                    &StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE - 1u],
+//                     APP_CFG_STARTUP_TASK_PRIO,
+//                     APP_CFG_STARTUP_TASK_PRIO,
+//                    &StartupTaskStk[0u],
+//                     APP_CFG_STARTUP_TASK_STK_SIZE,
+//                     0u,
+//                    (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+//
+//#if OS_TASK_NAME_EN > 0u
+//    OSTaskNameSet(         APP_CFG_STARTUP_TASK_PRIO,
+//                  (INT8U *)"Startup Task",
+//                           &os_err);
+//#endif
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
+
+    
 
     while (DEF_ON) {                                            /* Should Never Get Here.                               */
         ;
@@ -134,6 +168,30 @@ int  main (void)
 *                  used.  The compiler should not generate any code for this statement.
 *********************************************************************************************************
 */
+void task1(void* p_arg) {
+    task_para_set* task_data;
+    task_data = p_arg;
+    while (1) {
+        printf("Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
+        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+            fprintf(Output_fp, "Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
+            fclose(Output_fp);
+        }
+        OSTimeDly(task_data->TaskPeriodic);
+    }
+}
+void task2(void* p_arg) {
+    task_para_set* task_data;
+    task_data = p_arg;
+    while (1) {
+        printf("Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
+        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+            fprintf(Output_fp, "Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
+            fclose(Output_fp);
+        }
+        OSTimeDly(task_data->TaskPeriodic);
+    }
+}
 
 static  void  StartupTask (void *p_arg)
 {

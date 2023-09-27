@@ -87,7 +87,65 @@
 *********************************************************************************************************
 *********************************************************************************************************
 */
+void OutFileInit() {
+    /*Clear the file*/
+    if ((Output_err = fopen_s(&Output_fp, OUTPUT_FILE_NAME, "w")) == 0) {
+        fclose(Output_fp);
+    }
+    else {
+        printf("Error to clear output file");
+    }
+}
 
+void InputFile() {
+    /*
+    * Read File
+    * Task Information
+    * Task_ID ArriveTime Execution Periodic
+    */
+    errno_t err;
+    if ((err = fopen_s(&fp, INPUT_FILE_NAME, "r")) == 0) {
+        printf("The file 'Taskset.txt' was opened\n");
+    }
+    else {
+        printf("The file 'TaskSet.txt' was not opened\n");
+    }
+    char str[MAX];
+    char* ptr;
+    char* pTmp = NULL;
+    int TaskInfo[INFO], i, j = 0;
+    TASK_NUMBER = 0;
+
+    while (!feof(fp)) {
+        i = 0;
+        memset(str, 0, sizeof(str));
+        fgets(str, sizeof(str) - 1, fp);
+        ptr = strtok_s(str, " ", &pTmp);
+        while (ptr != NULL) {
+            TaskInfo[i] = atoi(ptr);
+            ptr = strtok_s(NULL, " ", &pTmp);
+            if (i == 0) {
+                TASK_NUMBER++;
+                TaskParameter[j].TaskID = TASK_NUMBER;
+            }
+            else if (i == 1) {
+                TaskParameter[j].TaskArriveTime = TaskInfo[i];
+            }
+            else if (i == 2) {
+                TaskParameter[j].TaskExecutionTime = TaskInfo[i];
+            }
+            else if (i == 3) {
+                TaskParameter[j].TaskPeriodic = TaskInfo[i];
+            }
+            i++;
+        }
+        /*Initial Priority*/
+        TaskParameter[j].TaskPriority = j; //just an example
+        j++;
+    }
+    fclose(fp);
+    /*read file*/
+}
 /*
 *********************************************************************************************************
 *********************************************************************************************************
