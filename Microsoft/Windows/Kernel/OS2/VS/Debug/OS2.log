@@ -1,8 +1,3 @@
-﻿  main.c
-C:\Users\Arthur\Desktop\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(106,16): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
-C:\Users\Arthur\Desktop\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(106,14): warning C4047: '=': 'OS_STK **' 與 'int' 間接取值的層級不同
-C:\Users\Arthur\Desktop\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(110,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
-C:\Users\Arthur\Desktop\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(115,25): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
-C:\Users\Arthur\Desktop\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(125,25): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
-C:\Users\Arthur\Desktop\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\main.c(89,17): warning C4101: 'os_err': 未參考的區域變數
-  OS2.vcxproj -> C:\Users\Arthur\Desktop\Micrium_Win32_Kernel\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
+﻿  os_core.c
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(978,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
+  OS2.vcxproj -> D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

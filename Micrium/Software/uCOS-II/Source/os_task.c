@@ -348,10 +348,10 @@ INT8U  OSTaskCreate (void   (*task)(void *p_arg),
 #if OS_TASK_CREATE_EXT_EN > 0u
 INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
                         void    *p_arg,
-                        OS_STK  *ptos,
+                        OS_STK  *ptos, //point to top of stack
                         INT8U    prio,
                         INT16U   id,
-                        OS_STK  *pbos,
+                        OS_STK  *pbos, //point to bottom of stack
                         INT32U   stk_size,
                         void    *pext,
                         INT16U   opt)
@@ -387,14 +387,21 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         OS_EXIT_CRITICAL();
 
 #if (OS_TASK_STAT_STK_CHK_EN > 0u)
-        OS_TaskStkClr(pbos, stk_size, opt);                    /* Clear the task stack (if needed)     */
+        OS_TaskStkClr(pbos, stk_size, opt);                    /* Clear the task stack (if needed)     */  
+        /*
+        因為OSTaskDel()只有：
+        1. 把要刪除的task移出ready list
+        2. 把他的對應priority table的位置設置成0
+        3. 把他與他左右的TCB的前後指標(prev, next)重新拉過。
+        !!  沒有把TCB內的stack清空  !!
+        */
 #endif
 
         psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */
         err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);
         if (err == OS_ERR_NONE) {
             OS_TRACE_TASK_CREATE(OSTCBPrioTbl[prio]);
-            if (OSRunning == OS_TRUE) {                        /* Find HPT if multitasking has started */
+            if (OSRunning == OS_TRUE) {                        /* Find HPT(high priority task) if multitasking has started */
                 OS_Sched();
             }
         } else {
@@ -869,17 +876,17 @@ INT8U  OSTaskResume (INT8U prio)
         OS_EXIT_CRITICAL();
         return (OS_ERR_TASK_NOT_EXIST);
     }
-    if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) != OS_STAT_RDY) { /* Task must be suspended                */
-        ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;    /* Remove suspension                     */
+    if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) != OS_STAT_RDY) { /* Task must be suspended                */ //檢查是否將要resume的task目前是否為suspend
+        ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;    /* Remove suspension                     */ //把suspension的狀態拿掉
         if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) == OS_STAT_RDY) { /* See if task is now ready         */
             if (ptcb->OSTCBDly == 0u) {
-                OSRdyGrp               |= ptcb->OSTCBBitY;    /* Yes, Make task ready to run           */
+                OSRdyGrp               |= ptcb->OSTCBBitY;    /* Yes, Make task ready to run           */ //把task放回ready list
                 OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
                 OS_TRACE_TASK_READY(ptcb);
                 OS_EXIT_CRITICAL();
                 if (OSRunning == OS_TRUE) {
                     OS_TRACE_TASK_RESUME(ptcb);
-                    OS_Sched();                               /* Find new highest priority task        */
+                    OS_Sched();                               /* Find new highest priority task        */ //跑一次sched，即可把剛剛醒來的task考慮進sched中
                 }
             } else {
                 OS_EXIT_CRITICAL();

@@ -553,6 +553,7 @@ OS_STK  *OSTaskStkInit (void  (*task)(void  *pd), void  *p_arg, OS_STK  *ptos, I
 #if (OS_CPU_HOOKS_EN > 0u) && (OS_TASK_SW_HOOK_EN > 0u)
 void  OSTaskSwHook (void)
 {
+    //printf("Task Switch Hook\n");
 #if (OS_APP_HOOKS_EN > 0u)
     App_TaskSwHook();
 #endif
@@ -689,7 +690,7 @@ void  OSStartHighRdy (void)
 
     OSTaskSwHook();
     OSRunning = 1;
-
+    
     p_stk = (OS_TASK_STK *)OSTCBHighRdy->OSTCBStkPtr;                   /* OSTCBCur  = OSTCBHighRdy;                                */
                                                                         /* OSPrioCur = OSPrioHighRdy;                               */
     ResumeThread(p_stk->ThreadHandle);
@@ -778,8 +779,8 @@ void  OSCtxSw (void)
     OS_TASK_STK  *p_stk;
     OS_TASK_STK  *p_stk_new;
 #if (OS_MSG_TRACE > 0u)
-    OS_TCB       *p_tcb_cur;
-    OS_TCB       *p_tcb_new;
+    OS_TCB       *p_tcb_cur; //讽玡taskTCB(璶眖CPU砆传ㄓ)
+    OS_TCB       *p_tcb_new; //讽玡程蔼纔舦taskTCB(璶传CPU)
 #endif
     CPU_SR_ALLOC();
 
@@ -789,18 +790,25 @@ void  OSCtxSw (void)
 #endif
 
 #if (OS_MSG_TRACE > 0u)
-    p_tcb_cur = OSTCBCur;
-    p_tcb_new = OSTCBHighRdy;
+    //非称璶秨﹍传临⊿传
+    p_tcb_cur = OSTCBCur; //璶砆传奔task
+    p_tcb_new = OSTCBHighRdy; //纔舦程蔼璶砆传ㄓtask
+    /*printf("currentTask[%d], nextTask[%d]\n", OSTCBCur->OSTCBId, OSTCBCur->OSTCBNext->OSTCBId);*/
 #endif
 
 
-    p_stk = (OS_TASK_STK *)OSTCBCur->OSTCBStkPtr;
+    p_stk = (OS_TASK_STK *)OSTCBCur->OSTCBStkPtr; //璶砆传奔taskstack pointer
 
     OSTaskSwHook();
 
-    OSTCBCur  = OSTCBHighRdy;
-    OSPrioCur = OSPrioHighRdy;
-
+    //传Ч
+    OSTCBCur  = OSTCBHighRdy; //current传Θ纔舦程蔼
+    OSPrioCur = OSPrioHighRdy; //纔舦程蔼priority, [int8U]
+    //printf("currentTask.addr = %p, nextTask.addr = %p\n", OSTCBCur, OSTCBCur->OSTCBNext);
+   /* printf("%d \t task(%2d)(%2d) \t task(%2d)(%2d) \t %d\n",
+        OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBCur->OSTCBNext->OSTCBId, OSTCBCur->OSTCBNext->OSTCBId, OSCtxSwCtr);*/
+   
+    
     if (p_stk->TaskState == STATE_RUNNING) {
         p_stk->TaskState  = STATE_SUSPENDED;
     }

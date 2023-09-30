@@ -711,10 +711,19 @@ void  OSIntExit (void)
                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
                 if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
 #if OS_TASK_PROFILE_EN > 0u
-                    OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task  */
+                    
+                    //OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task  */
+                    OSTCBCur->OSTCBCtxSwCtr++;
+                    printf("%d\t\ttask(%2d)\t\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSPrioCur, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBId, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBCtxSwCtr, OSCtxSwCtr);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%d\t\ttask(%2d)\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSPrioCur, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBId, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBCtxSwCtr, OSCtxSwCtr);
+                        fclose(Output_fp);
+                    }
 #endif
                     OSCtxSwCtr++;                          /* Keep track of the number of ctx switches */
-
+                    //printf("interrupt CtxSw => OSCtxSwCtr = %d\n", OSCtxSwCtr);
+                    
+                    /*printf("currentTask = %d, nextTask = %d\n\n", OS_TASK_IDLE_PRIO, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBId);*/
 #if OS_TASK_CREATE_EXT_EN > 0u
 #if defined(OS_TLS_TBL_SIZE) && (OS_TLS_TBL_SIZE > 0u)
                     OS_TLS_TaskSw();
@@ -875,6 +884,11 @@ void  OSStart (void)
         OSPrioCur     = OSPrioHighRdy;
         OSTCBHighRdy  = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
         OSTCBCur      = OSTCBHighRdy;
+        printf("%d\t\t***********\t\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSCtxSwCtr);
+        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+            fprintf(Output_fp, "%d\t\t***********\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSCtxSwCtr);
+            fclose(Output_fp);
+        }
         OSStartHighRdy();                            /* Execute target specific code to start task     */
     }
 }
@@ -988,7 +1002,9 @@ void  OSTimeTick (void)
             return;
         }
 #endif
-        ptcb = OSTCBList;                                  /* Point at first TCB in TCB list               */
+        /*每個Tick都在檢查有哪個task已經變成ready，要把他們對應的Ready Table位置設置成1
+        每個Tick都會掃過所有TCB*/
+        ptcb = OSTCBList;                                  /* Point at first TCB in TCB list               */ //OSTCBList
         while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {     /* Go through all TCBs in TCB list              */
             OS_ENTER_CRITICAL();
             if (ptcb->OSTCBDly != 0u) {                    /* No, Delayed or waiting for event with TO     */
@@ -1405,8 +1421,9 @@ static  void  OS_InitMisc (void)
     OSTaskCtr                 = 0u;                        /* Clear the number of tasks                */
 
     OSRunning                 = OS_FALSE;                  /* Indicate that multitasking not started   */
-
+    
     OSCtxSwCtr                = 0u;                        /* Clear the context switch counter         */
+    
     OSIdleCtr                 = 0uL;                       /* Clear the 32-bit idle counter            */
 
 #if OS_TASK_STAT_EN > 0u
@@ -1705,7 +1722,6 @@ void  OS_MemCopy (INT8U  *pdest,
 *              2) Rescheduling is prevented when the scheduler is locked (see OS_SchedLock())
 *********************************************************************************************************
 */
-
 void  OS_Sched (void)
 {
 #if OS_CRITICAL_METHOD == 3u                           /* Allocate storage for CPU status register     */
@@ -1713,25 +1729,70 @@ void  OS_Sched (void)
 #endif
 
 
-
+    
     OS_ENTER_CRITICAL();
     if (OSIntNesting == 0u) {                          /* Schedule only if all ISRs done and ...       */
         if (OSLockNesting == 0u) {                     /* ... scheduler is not locked                  */
-            OS_SchedNew();
+            OS_SchedNew(); //取得當前在ready list中的最高優先權，也就是修改OSTCBHighRdy
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
+                //printf("OSPrioCur = %d, OSPrioHighRdy = %d\n", OSPrioCur, OSPrioHighRdy);
 #if OS_TASK_PROFILE_EN > 0u
-                OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task      */
-#endif
-                OSCtxSwCtr++;                          /* Increment context switch counter             */
 
+                /*if (OSPrioHighRdy == OS_TASK_IDLE_PRIO) {
+                    printf("%d \t task(%2d) \t\t\t\t %d \n", OSTime, OS_TASK_IDLE_PRIO, OSCtxSwCtr);
+                }
+                printf("%d \t task(%2d)(%2d) \t task(%2d)(%2d) \t %d\n",
+                    OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBCur->OSTCBNext->OSTCBId, OSTCBCur->OSTCBNext->OSTCBCtxSwCtr, OSCtxSwCtr);*/
+                printf("%d\t\ttask(%2d)(%2d)\t\t\t", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%d\t\ttask(%2d)(%2d)\t\t", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr);
+                    fclose(Output_fp);
+                }
+                if (OSPrioHighRdy == OS_TASK_IDLE_PRIO) {
+                    printf("task(%2d)\t\t", OS_TASK_IDLE_PRIO);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "task(%2d)\t\t", OS_TASK_IDLE_PRIO);
+                        fclose(Output_fp);
+                    }
+                }
+                else {
+                    printf("task(%2d)(%2d)\t\t", OSTCBPrioTbl[OSPrioHighRdy]->OSTCBId, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBCtxSwCtr);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "task(%2d)(%2d)\t\t", OSTCBPrioTbl[OSPrioHighRdy]->OSTCBId, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBCtxSwCtr);
+                        fclose(Output_fp);
+                    }
+                }
+                printf("%2d\n", OSCtxSwCtr);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d\n", OSCtxSwCtr);
+                    fclose(Output_fp);
+                }
+
+                //OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task      */ //最高優先權的task，被context switch到的次數
+                OSTCBCur->OSTCBCtxSwCtr++;
+                //printf("Tick %d, currentTask %d, nextTask %d, context switch\n", OSTimeGet(), OSTCBCur->OSTCBId, OSTCBCur->OSTCBNext->OSTCBId);
+#endif          
+                
+                /*printf("%d \t task(%2d)(%2d) \t task(%2d)(%2d) \t %d\n",
+                    OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBCur->OSTCBNext->OSTCBId, OSTCBCur->OSTCBNext->OSTCBId, OSCtxSwCtr);*/
+
+                OSCtxSwCtr++;                          /* Increment context switch counter             */ //整個系統的context switch次數
+                /*printf("Sched CtxSw => OSCtxSwCtr = %d\n", OSCtxSwCtr);*/
+                
+                /*printf("OSCtxSwCtr = %d\n", OSCtxSwCtr);
+                if (OSPrioHighRdy == OS_TASK_IDLE_PRIO) {
+                    printf("IDLE\n");
+                }*/
 #if OS_TASK_CREATE_EXT_EN > 0u
 #if defined(OS_TLS_TBL_SIZE) && (OS_TLS_TBL_SIZE > 0u)
                 OS_TLS_TaskSw();
 #endif
 #endif
-
                 OS_TASK_SW();                          /* Perform a context switch                     */
+                /*printf("%d \t task(%2d)(%2d) \t task(%2d)(%2d) \t %d\n", 
+                    OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSTCBCur->OSTCBNext->OSTCBId, OSTCBCur->OSTCBNext->OSTCBCtxSwCtr, OSCtxSwCtr);*/
+                //printf("CurrentTask[%d].addr = %p, NextTask[%d].addr = %p\n", OSTCBCur->OSTCBId, OSTCBCur, OSTCBCur->OSTCBNext->OSTCBId, OSTCBCur->OSTCBNext);
             }
         }
     }
@@ -1847,7 +1908,6 @@ void  OS_TaskIdle (void *p_arg)
 #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr = 0u;
 #endif
-
 
 
     p_arg = p_arg;                               /* Prevent compiler warning for not using 'p_arg'     */

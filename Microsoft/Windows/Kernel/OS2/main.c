@@ -143,9 +143,12 @@ int  main (void)
 //                  (INT8U *)"Startup Task",
 //                           &os_err);
 //#endif
+    printf("Tick\t\tCurrentTask ID\t\t\tNextTask ID\t\tNumber of ctx switches\n");
+    /*printf("OS Task Number = %d\n", OSTaskCtr);*/
+    
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
 
-    
+   
 
     while (DEF_ON) {                                            /* Should Never Get Here.                               */
         ;
@@ -172,11 +175,11 @@ void task1(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;
     while (1) {
-        printf("Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
-        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+        //printf("Tick: %d, Hello from task%d, ID = %d\n", OSTime, task_data->TaskID, OSTCBCur->OSTCBId);
+        /*if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
             fprintf(Output_fp, "Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
             fclose(Output_fp);
-        }
+        }*/
         OSTimeDly(task_data->TaskPeriodic);
     }
 }
@@ -184,11 +187,11 @@ void task2(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;
     while (1) {
-        printf("Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
-        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+        //printf("Tick: %d, Hello from task%d, ID = %d\n", OSTime, task_data->TaskID, OSTCBCur->OSTCBId);
+        /*if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
             fprintf(Output_fp, "Tick: %d, Hello from task%d\n", OSTime, task_data->TaskID);
             fclose(Output_fp);
-        }
+        }*/
         OSTimeDly(task_data->TaskPeriodic);
     }
 }
