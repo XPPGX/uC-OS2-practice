@@ -115,7 +115,7 @@ void InputFile() {
     char* pTmp = NULL;
     int TaskInfo[INFO], i, j = 0;
     TASK_NUMBER = 0;
-
+    
     while (!feof(fp)) {
         i = 0;
         memset(str, 0, sizeof(str));
@@ -140,7 +140,9 @@ void InputFile() {
             i++;
         }
         /*Initial Priority*/
-        TaskParameter[j].TaskPriority = j; //just an example
+        /*M11102136*/
+        TaskParameter[j].TaskPriority = j + 1; //just an example
+        /*M11102136*/
         j++;
     }
     fclose(fp);

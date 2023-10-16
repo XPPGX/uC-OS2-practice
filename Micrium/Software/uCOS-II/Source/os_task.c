@@ -393,7 +393,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         1. 把要刪除的task移出ready list
         2. 把他的對應priority table的位置設置成0
         3. 把他與他左右的TCB的前後指標(prev, next)重新拉過。
-        !!  沒有把TCB內的stack清空  !!
+        !!  沒有把已刪除的task的TCB內的stack清空  !!
         */
 #endif
 
@@ -490,7 +490,7 @@ INT8U  OSTaskDel (INT8U prio)
 #endif
 
     OS_ENTER_CRITICAL();
-    if (prio == OS_PRIO_SELF) {                         /* See if requesting to delete self            */
+    if (prio == OS_PRIO_SELF) {                         /* See if requesting to delete self            */ //OS_PRIO_SELF == 0xFFu，代表不知道task的priority還是要砍掉自己
         prio = OSTCBCur->OSTCBPrio;                     /* Set priority to delete to current           */
     }
     ptcb = OSTCBPrioTbl[prio];

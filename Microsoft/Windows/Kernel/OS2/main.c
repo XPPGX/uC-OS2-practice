@@ -143,7 +143,11 @@ int  main (void)
 //                  (INT8U *)"Startup Task",
 //                           &os_err);
 //#endif
-    printf("Tick\t\tCurrentTask ID\t\t\tNextTask ID\t\tNumber of ctx switches\n");
+
+    /*M11102136*/
+    //printf("Tick\t\tCurrentTask ID\t\t\tNextTask ID\t\tNumber of ctx switches\n");
+    /*M11102136*/
+
     /*printf("OS Task Number = %d\n", OSTaskCtr);*/
     
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
