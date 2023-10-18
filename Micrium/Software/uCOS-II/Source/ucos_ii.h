@@ -80,10 +80,10 @@ extern "C" {
 /*Task structure*/
 typedef struct task_para_set {
     INT16U TaskID;
-    INT16U TaskArriveTime;
-    INT16U TaskExecutionTime;
-    INT16U TaskPeriodic;
-    INT16U TaskNumber;
+    INT16U TaskArriveTime; //
+    INT16U TaskExecutionTime; //record in each element of FIFO
+    INT16U TaskPeriodic; //implmented by OSTimeDly
+    INT16U TaskNumber; 
     INT16U TaskPriority;
 }task_para_set;
 
@@ -1506,6 +1506,30 @@ void          OSCtxSw                 (void);
 
 void OutFileInit(void);
 void InputFile(void);
+
+/*M11102136 [PA1][PART-III]*/
+//#define FIFO_SCHDULE
+//
+//struct define
+typedef struct fifo_task {
+    OS_TCB* FIFO_PTCB;
+    int REMAIN_TIME;
+    struct fifo_task* FIFO_TASK_PTR_NEXT;
+}FIFO_TASK;
+
+//global variable define
+
+/* IDLE TASK 的 ptcb 以 NULL 表示 */
+OS_EXT FIFO_TASK* OS_FIFO_PTR_HEAD; //maintain the FIFO head
+OS_EXT FIFO_TASK* OS_FIFO_PTR_TAIL; //maintain the FIFO tail
+
+OS_EXT int ArriveTime;
+
+//function prototype
+OS_EXT void FIFO_ENQUEUE(FIFO_TASK* FifoTaskPtr); //如果 enqueue 的時候，考慮 FIFO_QUEUE 是 EMPTY的
+OS_EXT void FIFO_DEQUEUE(void); // dequeue 的時候要順便 free(FIFO_TASK_PTR)
+/*M11102136 [PA1][PART-III]*/
+
 /*
 *********************************************************************************************************
 *                                   LOOK FOR MISSING #define CONSTANTS

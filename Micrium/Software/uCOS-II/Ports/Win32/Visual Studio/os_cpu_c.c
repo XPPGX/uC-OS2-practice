@@ -529,7 +529,7 @@ OS_STK  *OSTaskStkInit (void  (*task)(void  *pd), void  *p_arg, OS_STK  *ptos, I
     p_stk->InitSignalPtr =  NULL;
     p_stk->Terminate     =  DEF_FALSE;
     p_stk->OSTCBPtr      =  NULL;
-
+    
     return ((OS_STK *)p_stk);
 }
 
@@ -624,8 +624,9 @@ void  OSTCBInitHook (OS_TCB  *p_tcb)
     }
 
 #if (OS_MSG_TRACE > 0u)
-    //OS_Printf("Task[%3.1d] created, TCB Address  %p\n", p_tcb->OSTCBPrio, p_tcb);
+    /*M11102136 [PA1][PART-I]*/
     //OS_Printf("Task[%3.1d] created, Thread ID %5.0d\n", p_tcb->OSTCBPrio, p_stk->ThreadID);
+    /*M11102136 [PA1][PART-I]*/
 #endif
 
     p_stk->TaskState = STATE_CREATED;

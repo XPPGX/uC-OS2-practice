@@ -1,10 +1,8 @@
 ﻿  os_core.c
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(891,20): warning C4477: 'printf' : 格式字串 '%13x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'os_tcb *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(891,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 3 的類型為 'OS_TCB *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(891,20): warning C4477: 'printf' : 格式字串 '%13x' 需要 'unsigned int' 類型的引數，但 variadic 引數 4 的類型為 'os_tcb *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(986,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2201,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2203,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2204,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'OS_TCB *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2205,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(990,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(1033,34): warning C4133: '函式': 不相容的類型 - 從 'OS_TCB *' 至 'FIFO_TASK *'
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2218,26): warning C4133: '函式': 不相容的類型 - 從 'OS_TCB *' 至 'FIFO_TASK *'
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2247,27): warning C4028: 型式參數 1 與來自宣告的不同
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2249,61): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2278,5): warning C4013: 'free' 未定義; 假設 extern 傳回整數
   OS2.vcxproj -> D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

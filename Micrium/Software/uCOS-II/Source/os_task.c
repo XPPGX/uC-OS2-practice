@@ -396,7 +396,17 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         !!  沒有把已刪除的task的TCB內的stack清空  !!
         */
 #endif
-
+        /*M11102136 [PA1][PART-III]*/
+        ArriveTime = 0; //初始化每個 Task 的 Arrive Time
+        if (p_arg == NULL) { //只有 IDLE TASK 才會進到這，因為 IDLE TASK 的 p_arg 是 NULL
+            printf("Task %2d p_arg is null\n\n\n", prio);
+        }
+        else {
+            task_para_set* TempPargPtr = (task_para_set*)p_arg;
+            ArriveTime = TempPargPtr->TaskArriveTime; //紀錄 Arrive Time
+        }
+        /*M11102136 [PA1][PART-III]*/
+        
         psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */
         err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);
         if (err == OS_ERR_NONE) {
@@ -854,6 +864,13 @@ void  OSTaskNameSet (INT8U   prio,
 #if OS_TASK_SUSPEND_EN > 0u
 INT8U  OSTaskResume (INT8U prio)
 {
+    //在這裡，Resume只要 
+    //    1. 進入critical section ，
+    //    2. if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) != OS_STAT_RDY) //ptcb一定要是SUSPEND
+    //    3. ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND; //把SUSPEND拿掉
+    //    4. ptcb在PrioTbl對應的位置，要設置成1
+    //    5. 離開critical section
+
     OS_TCB    *ptcb;
 #if OS_CRITICAL_METHOD == 3u                                  /* Storage for CPU status register       */
     OS_CPU_SR  cpu_sr = 0u;
@@ -876,7 +893,7 @@ INT8U  OSTaskResume (INT8U prio)
         OS_EXIT_CRITICAL();
         return (OS_ERR_TASK_NOT_EXIST);
     }
-    if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) != OS_STAT_RDY) { /* Task must be suspended                */ //檢查是否將要resume的task目前是否為suspend
+    if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) != OS_STAT_RDY) { /* Task must be suspended                */ //檢查將要resume的task目前是否為suspend
         ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;    /* Remove suspension                     */ //把suspension的狀態拿掉
         if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) == OS_STAT_RDY) { /* See if task is now ready         */
             if (ptcb->OSTCBDly == 0u) {
@@ -1010,6 +1027,10 @@ INT8U  OSTaskStkChk (INT8U         prio,
 #if OS_TASK_SUSPEND_EN > 0u
 INT8U  OSTaskSuspend (INT8U prio)
 {
+    //在這裡，suspend只要進入Critical section之後
+    //1. 把 task 在 ready table 中的位置從1改成0就好了
+    //2. 把 task 的 OSTCBStat 紀錄的狀態用 "OR" operation 把 OS_STAT_SUSPEND 加進去
+    //即完成task suspend
     BOOLEAN    self;
     OS_TCB    *ptcb;
     INT8U      y;

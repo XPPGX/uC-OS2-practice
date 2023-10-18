@@ -105,7 +105,7 @@ void InputFile() {
     */
     errno_t err;
     if ((err = fopen_s(&fp, INPUT_FILE_NAME, "r")) == 0) {
-        printf("The file 'Taskset.txt' was opened\n");
+        printf("The file 'Taskset.txt' was opened\n\n");
     }
     else {
         printf("The file 'TaskSet.txt' was not opened\n");

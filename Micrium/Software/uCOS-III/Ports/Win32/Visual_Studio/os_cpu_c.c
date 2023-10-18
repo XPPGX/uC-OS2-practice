@@ -614,7 +614,6 @@ CPU_STK  *OSTaskStkInit (OS_TASK_PTR    p_task,
     p_task_info->ThreadHandle  =  NULL;
     p_task_info->InitSignalPtr =  NULL;
     p_task_info->SignalPtr     =  NULL;
-
 	return ((CPU_STK*)p_task_info);
 }
 
