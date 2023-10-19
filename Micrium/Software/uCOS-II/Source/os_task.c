@@ -404,6 +404,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         else {
             task_para_set* TempPargPtr = (task_para_set*)p_arg;
             ArriveTime = TempPargPtr->TaskArriveTime; //¬ö¿ý Arrive Time
+            //OS_TASK_FIFO_Deadline[TempPargPtr->TaskID] = TempPargPtr->TaskArriveTime;
         }
         /*M11102136 [PA1][PART-III]*/
         

@@ -175,7 +175,8 @@ void task(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;
     while (1) {
-        printf("Tick: %d, Hello from task%d, ID = %d\n", OSTime, task_data->TaskID, OSTCBCur->OSTCBId);
+        //Execution Time沒有被模擬，所以會一直call OSTimeDly、印下面那行
+        //printf("Tick: %d, Hello from task%d, ID = %d\n", OSTime, task_data->TaskID, OSTCBCur->OSTCBId);
         OSTimeDly(task_data->TaskPeriodic);
     }
 }

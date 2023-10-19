@@ -621,6 +621,12 @@ void  OSInit (void)
 #endif
 
     OS_InitTaskIdle();                                           /* Create the Idle Task                     */
+    /*M11102136 [PA1][PART-III]*/
+    for (int i = 0; i < OS_MAX_TASKS; i++) {
+        OS_TASK_FIFO_PTR_MAP[i] = NULL;
+        OS_TASK_FIFO_Deadline[i] = 0;
+    }
+    /*M11102136 [PA1][PART-III]*/
 #if OS_TASK_STAT_EN > 0u
     OS_InitTaskStat();                                           /* Create the Statistic Task                */
 #endif
@@ -707,9 +713,17 @@ void  OSIntExit (void)
         }
         if (OSIntNesting == 0u) {                          /* Reschedule only if all ISRs complete ... */
             if (OSLockNesting == 0u) {                     /* ... and not locked.                      */
-                OS_SchedNew();
-                OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
-                if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
+                //OS_SchedNew();
+                //OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
+                if (OS_FIFO_PTR_HEAD == NULL) {
+                    OSTCBHighRdy = OSTCBPrioTbl[OS_TASK_IDLE_PRIO];
+                }
+                else {
+                    OSTCBHighRdy = OS_FIFO_PTR_HEAD->FIFO_PTCB;
+                }
+
+                //if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
+                if (OSTCBHighRdy != OSTCBCur) {
 #if OS_TASK_PROFILE_EN > 0u
                     /*M11102136*/
                     //OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task  */
@@ -882,9 +896,11 @@ void  OSStart (void)
 {
     if (OSRunning == OS_FALSE) {
         
-        OS_SchedNew();                               /* Find highest priority's task priority number   */
-        OSPrioCur     = OSPrioHighRdy;
-        OSTCBHighRdy  = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
+        //OS_SchedNew();                               /* Find highest priority's task priority number   */
+        
+        //OSPrioCur     = OSPrioHighRdy;
+        //OSTCBHighRdy  = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
+        OSTCBHighRdy  = OS_FIFO_PTR_HEAD->FIFO_PTCB;
         OSTCBCur      = OSTCBHighRdy;
         /*M11102136 [PA1][PART-I]*/
         //printf("================TCB linked list================\n");
@@ -979,7 +995,16 @@ void  OSTimeTick (void)
 #if OS_TIME_GET_SET_EN > 0u
     OS_ENTER_CRITICAL();                                   /* Update the 32-bit tick counter               */
     OSTime++;
+    if (OSTime == 31) {
+        system("pause");
+    }
     printf("Tick = %d ===\n", OSTime);
+    if (OS_FIFO_PTR_HEAD == NULL) {
+        printf("Task now is %2d\n", OS_TASK_IDLE_PRIO);
+    }
+    else {
+        printf("Task now is %2d\n", OS_FIFO_PTR_HEAD->FIFO_PTCB->OSTCBId);
+    }
     OS_TRACE_TICK_INCREMENT(OSTime);
     OS_EXIT_CRITICAL();
 #endif
@@ -1014,6 +1039,43 @@ void  OSTimeTick (void)
             return;
         }
 #endif
+        //FIFO_HEAD 的 REMAIN_TIME --
+        if (OS_FIFO_PTR_HEAD != NULL) {
+
+            if (OS_FIFO_PTR_HEAD->REMAIN_TIME > 0) {
+                OS_FIFO_PTR_HEAD->REMAIN_TIME--;
+                if (OS_FIFO_PTR_HEAD->REMAIN_TIME == 0) {
+                    FIFO_DEQUEUE();
+                }
+            }
+            //printf("\tFIFO_HEAD = %2d => {REMAIN TIME = %2d}\n", OS_FIFO_PTR_HEAD->FIFO_PTCB->OSTCBId, OS_FIFO_PTR_HEAD->REMAIN_TIME);
+            /*if (OS_FIFO_PTR_HEAD->REMAIN_TIME == 0) {
+                FIFO_DEQUEUE();
+            }*/
+        }
+        //Period generator
+        ptcb = OSTCBList;
+        while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {
+            OS_ENTER_CRITICAL();
+            if (OS_TASK_FIFO_Deadline[ptcb->OSTCBId] > 0) {
+                OS_TASK_FIFO_Deadline[ptcb->OSTCBId]--;
+                printf("\t\tTask[%2d].deadline = %2d, ", ptcb->OSTCBId, OS_TASK_FIFO_Deadline[ptcb->OSTCBId]);
+                if (OS_TASK_FIFO_Deadline[ptcb->OSTCBId] == 0) {
+                    printf("New job arrived\n");
+                    if (OS_TASK_FIFO_PTR_MAP[ptcb->OSTCBId] != NULL) {
+                        printf("\t\tTask[%2d] Miss Deadline\n", ptcb->OSTCBId);
+                        system("pause");
+                        exit(1);
+                    }
+                    //不要直接 FIFO_ENQUEUE，
+                    FIFO_ENQUEUE(ptcb);
+                    OS_TASK_FIFO_Deadline[ptcb->OSTCBId] = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
+                }
+                printf("\n");
+            }
+            ptcb = ptcb->OSTCBNext;
+            OS_EXIT_CRITICAL();
+        }
         /*每個Tick都在檢查有哪個task已經變成ready，要把他們對應的Ready Table位置設置成1
         每個Tick都會掃過所有TCB*/
         ptcb = OSTCBList;                                  /* Point at first TCB in TCB list               */ //OSTCBList
@@ -1022,21 +1084,23 @@ void  OSTimeTick (void)
             if (ptcb->OSTCBDly != 0u) {                    /* No, Delayed or waiting for event with TO     */
                 ptcb->OSTCBDly--;                          /* Decrement nbr of ticks to end of delay       */
                 
-                printf("\ttask[%2d].DlyTime = %d\n", ptcb->OSTCBId, ptcb->OSTCBDly);
+                printf("\ttask[%2d] = {DlyTime = %d}\n", ptcb->OSTCBId, ptcb->OSTCBDly);
                 
                 if (ptcb->OSTCBDly == 0u) {                /* Check for timeout                            */
                     
                     //如果 ptcb->OSTCBDly == 0，則把該tcb塞進FIFO_Queue的尾巴
                     //ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND; //此復原方式，需配合readyGrp
 
+                    /*M11102136 [PA1][PART-III]*/
                     printf("\tTCB = {ID = %d, ExecutionTime = %d}\n", ptcb->OSTCBId, TaskParameter[ptcb->OSTCBId - 1].TaskExecutionTime);
+                    
+                    ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;    // 把SUSPEND拿掉
                     FIFO_ENQUEUE(ptcb);
+                    OS_TASK_FIFO_Deadline[ptcb->OSTCBId] = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
+                    /*M11102136 [PA1][PART-III]*/
 
                     if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) != OS_STAT_RDY) {
                         ptcb->OSTCBStat  &= (INT8U)~(INT8U)OS_STAT_PEND_ANY;   /* Yes, Clear status flag   */
-
-                        ptcb->OSTCBStat  &= (INT8U)~(INT8U)OS_STAT_SUSPEND;    // 把SUSPEND拿掉
-
                         ptcb->OSTCBStatPend = OS_STAT_PEND_TO;                 /* Indicate PEND timeout    */
                     } else {
                         ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
@@ -1056,16 +1120,13 @@ void  OSTimeTick (void)
         //每個 TICK：
         //1. 減少 FIFO_HEAD 的 REMAIN_TIME
         //2. 檢查如果(FIFO_HEAD 的 REMAIN_TIME == 0)，則 DEQUEUE();
-        if (OS_FIFO_PTR_HEAD != NULL) {
-            printf("\tFIFO_HEAD = %2d => {REMAIN TIME = %2d}\n", OS_FIFO_PTR_HEAD->FIFO_PTCB->OSTCBId, OS_FIFO_PTR_HEAD->REMAIN_TIME);
-            if (OS_FIFO_PTR_HEAD->REMAIN_TIME > 0) {
-                OS_FIFO_PTR_HEAD->REMAIN_TIME--;
-            }
-
-            if (OS_FIFO_PTR_HEAD->REMAIN_TIME == 0) {
-                FIFO_DEQUEUE();
-            }
+        
+        
+        printf("\n\tFIFO now = {");
+        for (FIFO_TASK* iterPtr = OS_FIFO_PTR_HEAD; iterPtr != NULL; iterPtr = iterPtr->FIFO_TASK_PTR_NEXT) {
+            printf("task %2d, ", iterPtr->FIFO_PTCB->OSTCBId);
         }
+        printf("}\n");
         /*M11102136 [PA1][PART-III]*/
     }
 }
@@ -1772,11 +1833,18 @@ void  OS_Sched (void)
     OS_ENTER_CRITICAL();
     if (OSIntNesting == 0u) {                          /* Schedule only if all ISRs done and ...       */
         if (OSLockNesting == 0u) {                     /* ... scheduler is not locked                  */
-            OS_SchedNew(); //取得當前在ready list中的最高優先權，也就是修改OSTCBHighRdy
-            OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
-            
-            
-            if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
+            //OS_SchedNew(); //取得當前在ready list中的最高優先權，也就是修改OSTCBHighRdy
+            //OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
+            if (OS_FIFO_PTR_HEAD == NULL) {
+                OSTCBHighRdy = OSTCBPrioTbl[OS_TASK_IDLE_PRIO];
+            }
+            else {
+                OSTCBHighRdy = OS_FIFO_PTR_HEAD->FIFO_PTCB;
+            }
+
+            printf("OSTCBHighRdy %2d.addr = %p, OSTCBCur %2d.addr = %p\n", OSTCBHighRdy->OSTCBId, OSTCBHighRdy, OSTCBCur->OSTCBId, OSTCBCur);
+            //if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
+            if(OSTCBHighRdy != OSTCBCur){
 #if OS_TASK_PROFILE_EN > 0u
                 //OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task      */ //最高優先權的task，被context switch到的次數
                 OSTCBCur->OSTCBCtxSwCtr++;
@@ -2216,6 +2284,7 @@ INT8U  OS_TCBInit (INT8U    prio,
         if (ArriveTime == 0 && prio != OS_TASK_IDLE_PRIO) {
             //掛進FIFO_QUEUE
             FIFO_ENQUEUE(ptcb);
+            OS_TASK_FIFO_Deadline[ptcb->OSTCBId] = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
             OSRdyGrp               |= ptcb->OSTCBBitY;         /* Make task ready to run                   */
             OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
             OS_TRACE_TASK_READY(ptcb);
@@ -2232,10 +2301,11 @@ INT8U  OS_TCBInit (INT8U    prio,
 
         OSTaskCtr++;                                       /* Increment the #tasks counter             */
         OS_EXIT_CRITICAL();
+
         
         return (OS_ERR_NONE);
     }
-
+    
     OS_EXIT_CRITICAL();
     return (OS_ERR_TASK_NO_MORE_TCB);
 }
@@ -2252,6 +2322,8 @@ void FIFO_ENQUEUE(OS_TCB* ptcb) {
         OS_FIFO_PTR_TAIL->REMAIN_TIME         = TaskParameter[ptcb->OSTCBId - 1].TaskExecutionTime;
         
         OS_FIFO_PTR_HEAD                      = OS_FIFO_PTR_TAIL;
+        
+        OS_TASK_FIFO_PTR_MAP[ptcb->OSTCBId]   = OS_FIFO_PTR_TAIL;
     }
     else {
         FIFO_TASK* NewReady_FIFO_PTR          = (FIFO_TASK*)malloc(sizeof(FIFO_TASK));
@@ -2261,8 +2333,11 @@ void FIFO_ENQUEUE(OS_TCB* ptcb) {
 
         OS_FIFO_PTR_TAIL->FIFO_TASK_PTR_NEXT  = NewReady_FIFO_PTR;
         OS_FIFO_PTR_TAIL                      = OS_FIFO_PTR_TAIL->FIFO_TASK_PTR_NEXT;
+        
+        OS_TASK_FIFO_PTR_MAP[ptcb->OSTCBId]   = NewReady_FIFO_PTR;
     }
-    printf("\tTaskID [%2d] has enqueued in FIFO_QUEUE\n", ptcb->OSTCBId);
+    
+    printf("\tTaskID [%2d] has enqueued in FIFO_QUEUE, PTR_MAP is %p\n", ptcb->OSTCBId, OS_TASK_FIFO_PTR_MAP[ptcb->OSTCBId]);
 }
 
 void FIFO_DEQUEUE(void) {
@@ -2274,7 +2349,9 @@ void FIFO_DEQUEUE(void) {
 
     FIFO_TASK* DelPtr = OS_FIFO_PTR_HEAD;
     OS_FIFO_PTR_HEAD  = OS_FIFO_PTR_HEAD->FIFO_TASK_PTR_NEXT;
+    OS_TASK_FIFO_PTR_MAP[DelPtr->FIFO_PTCB->OSTCBId] = NULL;
     printf("\tTaskID [%2d] has dequeued in FIFO_QUEUE\n", DelPtr->FIFO_PTCB->OSTCBId);
+
     free(DelPtr);
 
     //如果 FIFO_HEAD 走到下一格後變成 NULL，代表 FIFO 目前沒有 TASK，接著要做 IDLE TASK

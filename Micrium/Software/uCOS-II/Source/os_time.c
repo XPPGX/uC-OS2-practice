@@ -58,27 +58,36 @@ void  OSTimeDly (INT32U ticks)
 #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr = 0u;
 #endif
-
-
-
-    if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
-        return;
-    }
-    if (OSLockNesting > 0u) {                    /* See if called with scheduler locked                */
-        return;
-    }
-    if (ticks > 0u) {                            /* 0 means no delay!                                  */
-        OS_ENTER_CRITICAL();
-        y            =  OSTCBCur->OSTCBY;        /* Delay current task                                 */
-        OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
-        OS_TRACE_TASK_SUSPENDED(OSTCBCur);
-        if (OSRdyTbl[y] == 0u) {
-            OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
+    
+    
+    if (OS_FIFO_PTR_HEAD->REMAIN_TIME == 0) {
+        printf("\tTask[%2d] delay", OS_FIFO_PTR_HEAD->FIFO_PTCB->OSTCBId);
+        if (OS_FIFO_PTR_HEAD->FIFO_TASK_PTR_NEXT == NULL) {
+            printf(", next is Task[%2d]\n", OS_TASK_IDLE_PRIO);
         }
-        OSTCBCur->OSTCBDly = ticks;              /* Load ticks in TCB                                  */
-        OS_TRACE_TASK_DLY(ticks);
-        OS_EXIT_CRITICAL();
-        OS_Sched();                              /* Find next task to run!                             */
+        else {
+            printf(", next is Task[%2d]\n", OS_FIFO_PTR_HEAD->FIFO_TASK_PTR_NEXT->FIFO_PTCB->OSTCBId);
+        }
+        /*FIFO_DEQUEUE();*/
+        if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
+            return;
+        }
+        if (OSLockNesting > 0u) {                    /* See if called with scheduler locked                */
+            return;
+        }
+        if (ticks > 0u) {                            /* 0 means no delay!                                  */
+            OS_ENTER_CRITICAL();
+            y = OSTCBCur->OSTCBY;        /* Delay current task                                 */
+            OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
+            OS_TRACE_TASK_SUSPENDED(OSTCBCur);
+            if (OSRdyTbl[y] == 0u) {
+                OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
+            }
+            //OSTCBCur->OSTCBDly = ticks;              /* Load ticks in TCB                                  */
+            OS_TRACE_TASK_DLY(ticks);
+            OS_EXIT_CRITICAL();
+            OS_Sched();                              /* Find next task to run!                             */
+        }
     }
 }
 

@@ -1523,11 +1523,19 @@ typedef struct fifo_task {
 OS_EXT FIFO_TASK* OS_FIFO_PTR_HEAD; //maintain the FIFO head
 OS_EXT FIFO_TASK* OS_FIFO_PTR_TAIL; //maintain the FIFO tail
 
+
+
 OS_EXT int ArriveTime;
+OS_EXT int OS_TASK_FIFO_Deadline[OS_MAX_TASKS];
+OS_EXT FIFO_TASK* OS_TASK_FIFO_PTR_MAP[OS_MAX_TASKS];
+
 
 //function prototype
 OS_EXT void FIFO_ENQUEUE(FIFO_TASK* FifoTaskPtr); //如果 enqueue 的時候，考慮 FIFO_QUEUE 是 EMPTY的
 OS_EXT void FIFO_DEQUEUE(void); // dequeue 的時候要順便 free(FIFO_TASK_PTR)
+
+
+
 /*M11102136 [PA1][PART-III]*/
 
 /*
