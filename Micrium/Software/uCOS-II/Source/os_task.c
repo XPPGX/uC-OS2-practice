@@ -399,7 +399,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         /*M11102136 [PA1][PART-III]*/
         ArriveTime = 0; //初始化每個 Task 的 Arrive Time
         if (p_arg == NULL) { //只有 IDLE TASK 才會進到這，因為 IDLE TASK 的 p_arg 是 NULL
-            printf("Task %2d p_arg is null\n\n\n", prio);
+            //printf("Task %2d p_arg is null\n\n\n", prio);
         }
         else {
             task_para_set* TempPargPtr = (task_para_set*)p_arg;

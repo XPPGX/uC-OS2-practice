@@ -61,12 +61,12 @@ void  OSTimeDly (INT32U ticks)
     
     
     if (OS_FIFO_PTR_HEAD->REMAIN_TIME == 0) {
-        printf("\tTask[%2d] delay", OS_FIFO_PTR_HEAD->FIFO_PTCB->OSTCBId);
+        //printf("\tTask[%2d] delay", OS_FIFO_PTR_HEAD->FIFO_PTCB->OSTCBId);
         if (OS_FIFO_PTR_HEAD->FIFO_TASK_PTR_NEXT == NULL) {
-            printf(", next is Task[%2d]\n", OS_TASK_IDLE_PRIO);
+            //printf(", next is Task[%2d]\n", OS_TASK_IDLE_PRIO);
         }
         else {
-            printf(", next is Task[%2d]\n", OS_FIFO_PTR_HEAD->FIFO_TASK_PTR_NEXT->FIFO_PTCB->OSTCBId);
+            //printf(", next is Task[%2d]\n", OS_FIFO_PTR_HEAD->FIFO_TASK_PTR_NEXT->FIFO_PTCB->OSTCBId);
         }
         /*FIFO_DEQUEUE();*/
         if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */

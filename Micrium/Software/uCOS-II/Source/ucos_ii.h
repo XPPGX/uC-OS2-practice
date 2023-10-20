@@ -1514,8 +1514,25 @@ void InputFile(void);
 typedef struct fifo_task {
     OS_TCB* FIFO_PTCB;
     int REMAIN_TIME;
+    int ARRIVE_AT_OS_TIME_TICK;
+    int EXE_TIME;
     struct fifo_task* FIFO_TASK_PTR_NEXT;
 }FIFO_TASK;
+
+typedef struct record_info {
+    int TCBCurId;
+    int TCBCur_CtxSwCtr;
+    int TCBNextId;
+    int TCBNext_CtxSwCtr;
+
+    //Response time = OSTime(at task dequeue) - OSTime(at task arriving);
+    int RESPONSE_TIME;
+    //Preemption time = OSTime(at task dequeue) - OSTime(at task arriving) - TaskExecutionTime;
+    int PREEMPTION_TIME;
+    //OSTimeDly = current value of Deadline;
+    int OSTIMEDLY;
+
+}RECORD_INFO;
 
 //global variable define
 

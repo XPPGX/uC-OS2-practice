@@ -123,28 +123,6 @@ int  main (void)
             (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
     }
     /*M11102136 [PA1][PART-III]*/
-
-//    OSTaskCreateExt( StartupTask,                               /* Create the startup task                              */
-//                     0,
-//                    &StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE - 1u],
-//                     APP_CFG_STARTUP_TASK_PRIO,
-//                     APP_CFG_STARTUP_TASK_PRIO,
-//                    &StartupTaskStk[0u],
-//                     APP_CFG_STARTUP_TASK_STK_SIZE,
-//                     0u,
-//                    (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-//
-//#if OS_TASK_NAME_EN > 0u
-//    OSTaskNameSet(         APP_CFG_STARTUP_TASK_PRIO,
-//                  (INT8U *)"Startup Task",
-//                           &os_err);
-//#endif
-
-    /*M11102136*/
-    //printf("Tick\t\tCurrentTask ID\t\t\tNextTask ID\t\tNumber of ctx switches\n");
-    /*M11102136*/
-
-    /*printf("OS Task Number = %d\n", OSTaskCtr);*/
     
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
 
