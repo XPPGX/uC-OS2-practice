@@ -623,8 +623,9 @@ void  OSInit (void)
     OS_InitTaskIdle();                                           /* Create the Idle Task                     */
     /*M11102136 [PA1][PART-III]*/
     for (int i = 0; i < OS_MAX_TASKS; i++) {
-        OS_TASK_FIFO_PTR_MAP[i] = NULL;
-        OS_TASK_FIFO_Deadline[i] = 0;
+        OS_TASK_FIFO_PTR_MAP[i]       = NULL;
+        OS_TASK_FIFO_Deadline[i]      = 0;
+        OS_TASK_FIFO_SameTick_Prio[i] = 0;
     }
     /*M11102136 [PA1][PART-III]*/
 #if OS_TASK_STAT_EN > 0u
@@ -900,7 +901,12 @@ void  OSStart (void)
         
         //OSPrioCur     = OSPrioHighRdy;
         //OSTCBHighRdy  = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
-        OSTCBHighRdy  = OS_FIFO_PTR_HEAD->FIFO_PTCB;
+        if (OS_FIFO_PTR_HEAD == NULL) {
+            OSTCBHighRdy = OSTCBPrioTbl[OS_TASK_IDLE_PRIO];
+        }
+        else{
+            OSTCBHighRdy = OS_FIFO_PTR_HEAD->FIFO_PTCB;
+        }
         OSTCBCur      = OSTCBHighRdy;
         /*M11102136 [PA1][PART-I]*/
         //printf("================TCB linked list================\n");
@@ -1053,7 +1059,7 @@ void  OSTimeTick (void)
                 FIFO_DEQUEUE();
             }*/
         }
-        //Period generator
+        //Period job generator
         ptcb = OSTCBList;
         while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {
             OS_ENTER_CRITICAL();
@@ -1068,7 +1074,8 @@ void  OSTimeTick (void)
                         exit(1);
                     }
                     //不要直接 FIFO_ENQUEUE，
-                    FIFO_ENQUEUE(ptcb);
+                    //FIFO_ENQUEUE(ptcb);
+                    FIFO_TEMP_ENQUEUE(ptcb);
                     OS_TASK_FIFO_Deadline[ptcb->OSTCBId] = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
                 }
                 printf("\n");
@@ -1095,7 +1102,7 @@ void  OSTimeTick (void)
                     printf("\tTCB = {ID = %d, ExecutionTime = %d}\n", ptcb->OSTCBId, TaskParameter[ptcb->OSTCBId - 1].TaskExecutionTime);
                     
                     ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;    // 把SUSPEND拿掉
-                    FIFO_ENQUEUE(ptcb);
+                    FIFO_TEMP_ENQUEUE(ptcb);
                     OS_TASK_FIFO_Deadline[ptcb->OSTCBId] = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
                     /*M11102136 [PA1][PART-III]*/
 
@@ -1116,6 +1123,7 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
+        FIFO_TEMP_ENQUEUE_TO_ORIGIN();
         /*M11102136 [PA1][PART-III]*/
         //每個 TICK：
         //1. 減少 FIFO_HEAD 的 REMAIN_TIME
@@ -2313,6 +2321,48 @@ INT8U  OS_TCBInit (INT8U    prio,
 /*M11102136 [PA1][PART-III]*/
 
 //把 arrive 的 TCB 掛進 FIFO 的 queue
+void FIFO_TEMP_ENQUEUE(OS_TCB* ptcb) {
+    FIFO_TASK* NewReady_FIFO_PTR = (FIFO_TASK*)malloc(sizeof(FIFO_TASK));
+    NewReady_FIFO_PTR->FIFO_PTCB = ptcb;
+    NewReady_FIFO_PTR->FIFO_TASK_PTR_NEXT = NULL;
+    NewReady_FIFO_PTR->REMAIN_TIME = TaskParameter[ptcb->OSTCBId - 1].TaskExecutionTime;
+
+    OS_TASK_FIFO_PTR_MAP[ptcb->OSTCBId] = NewReady_FIFO_PTR;
+
+    OS_TASK_FIFO_SameTick_Prio[ptcb->OSTCBId] = 1;
+
+    printf("\t[TEMP] TaskID [%2d] create in FIFO_PTR_MAP\n", ptcb->OSTCBId);
+}
+
+void FIFO_TEMP_ENQUEUE_TO_ORIGIN(void) {
+    OS_FIFO_PTR_HEAD_TEMP = NULL;
+    OS_FIFO_PTR_TAIL_TEMP = NULL;
+    
+    int TaskID = 0; //used to go through the OS_TASK_FIFO_SameTick_Prio[] to create a TEMP_FIFO_QUEUE
+    for (; TaskID < OS_MAX_TASKS; TaskID++) {
+        if (OS_TASK_FIFO_SameTick_Prio[TaskID] == 1) {
+            if (OS_FIFO_PTR_TAIL_TEMP == NULL) {
+                OS_FIFO_PTR_HEAD_TEMP = OS_TASK_FIFO_PTR_MAP[TaskID];
+                OS_FIFO_PTR_TAIL_TEMP = OS_FIFO_PTR_HEAD_TEMP;
+            }
+            else {
+                OS_FIFO_PTR_TAIL_TEMP->FIFO_TASK_PTR_NEXT = OS_TASK_FIFO_PTR_MAP[TaskID];
+                OS_FIFO_PTR_TAIL_TEMP                     = OS_FIFO_PTR_TAIL_TEMP->FIFO_TASK_PTR_NEXT;
+            }
+        }
+    }
+    if (OS_FIFO_PTR_TAIL_TEMP != NULL) {
+        if (OS_FIFO_PTR_HEAD == NULL) {
+            OS_FIFO_PTR_HEAD = OS_FIFO_PTR_HEAD_TEMP;
+            OS_FIFO_PTR_TAIL = OS_FIFO_PTR_TAIL_TEMP;
+        }
+        else {
+            OS_FIFO_PTR_TAIL->FIFO_TASK_PTR_NEXT = OS_FIFO_PTR_HEAD_TEMP;
+            OS_FIFO_PTR_TAIL = OS_FIFO_PTR_TAIL_TEMP;
+        }
+    }
+    memset(OS_TASK_FIFO_SameTick_Prio, 0, sizeof(int) * OS_MAX_TASKS); //Reset OS_TASK_FIFO_SameTick_Prio to 0
+}
 
 void FIFO_ENQUEUE(OS_TCB* ptcb) {
     if (OS_FIFO_PTR_TAIL == NULL) {

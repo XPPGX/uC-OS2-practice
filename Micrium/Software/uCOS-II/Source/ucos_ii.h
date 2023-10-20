@@ -1522,16 +1522,18 @@ typedef struct fifo_task {
 /* IDLE TASK 的 ptcb 以 NULL 表示 */
 OS_EXT FIFO_TASK* OS_FIFO_PTR_HEAD; //maintain the FIFO head
 OS_EXT FIFO_TASK* OS_FIFO_PTR_TAIL; //maintain the FIFO tail
-
-
+OS_EXT FIFO_TASK* OS_FIFO_PTR_HEAD_TEMP; //maintain the FIFO temp head for the multiple arrived jobs that in one tick
+OS_EXT FIFO_TASK* OS_FIFO_PTR_TAIL_TEMP; //maintain the FIFO temp tail for the multiple arrived jobs that in one tick
 
 OS_EXT int ArriveTime;
 OS_EXT int OS_TASK_FIFO_Deadline[OS_MAX_TASKS];
 OS_EXT FIFO_TASK* OS_TASK_FIFO_PTR_MAP[OS_MAX_TASKS];
-
+OS_EXT int OS_TASK_FIFO_SameTick_Prio[OS_MAX_TASKS];
 
 //function prototype
-OS_EXT void FIFO_ENQUEUE(FIFO_TASK* FifoTaskPtr); //如果 enqueue 的時候，考慮 FIFO_QUEUE 是 EMPTY的
+OS_EXT void FIFO_TEMP_ENQUEUE(OS_TCB* ptcb); //暫時的 FIFO_QUEUE 的 ENQUEUE
+OS_EXT void FIFO_TEMP_ENQUEUE_TO_ORIGIN(void); //把暫時的 FIFO_QUEUE 合併到真正的QUEUE上
+OS_EXT void FIFO_ENQUEUE(OS_TCB* ptcb); //如果 enqueue 的時候，考慮 FIFO_QUEUE 是 EMPTY的
 OS_EXT void FIFO_DEQUEUE(void); // dequeue 的時候要順便 free(FIFO_TASK_PTR)
 
 
