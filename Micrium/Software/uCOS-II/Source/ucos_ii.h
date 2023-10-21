@@ -1508,7 +1508,7 @@ void OutFileInit(void);
 void InputFile(void);
 
 /*M11102136 [PA1][PART-III]*/
-//#define FIFO_SCHDULE
+//#define _FIFO_DEBUG_
 //
 //struct define
 typedef struct fifo_task {
@@ -1533,7 +1533,8 @@ typedef struct record_info {
     int OSTIMEDLY;
 
 }RECORD_INFO;
-
+int FIFOTCBCurId;
+int FIFOTCBCur_CtxSwCtr;
 //global variable define
 
 /* IDLE TASK 的 ptcb 以 NULL 表示 */
@@ -1552,7 +1553,6 @@ OS_EXT void FIFO_TEMP_ENQUEUE(OS_TCB* ptcb); //暫時的 FIFO_QUEUE 的 ENQUEUE
 OS_EXT void FIFO_TEMP_ENQUEUE_TO_ORIGIN(void); //把暫時的 FIFO_QUEUE 合併到真正的QUEUE上
 OS_EXT void FIFO_ENQUEUE(OS_TCB* ptcb); //如果 enqueue 的時候，考慮 FIFO_QUEUE 是 EMPTY的
 OS_EXT void FIFO_DEQUEUE(void); // dequeue 的時候要順便 free(FIFO_TASK_PTR)
-
 
 
 /*M11102136 [PA1][PART-III]*/
