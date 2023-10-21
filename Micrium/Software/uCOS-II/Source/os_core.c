@@ -727,6 +727,10 @@ void  OSIntExit (void)
                 if (OSTCBHighRdy != OSTCBCur) {
                     if (OSTCBCur->OSTCBPrio == OS_TASK_IDLE_PRIO) {
                         printf("%2d\tPreemption\ttask(%2d)\ttask(%2d)(%2d)\n", OSTime, OS_TASK_IDLE_PRIO, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
+                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                            fprintf(Output_fp, "%2d\tPreemption\ttask(%2d)\ttask(%2d)(%2d)\n", OSTime, OS_TASK_IDLE_PRIO, OSTCBHighRdy->OSTCBId, OSTCBHighRdy->OSTCBCtxSwCtr);
+                            fclose(Output_fp);
+                        }
                     }
 #if OS_TASK_PROFILE_EN > 0u
                     
@@ -1101,6 +1105,11 @@ void  OSTimeTick (void)
 #endif
                     if (OS_TASK_FIFO_PTR_MAP[ptcb->OSTCBId] != NULL) {
                         printf("%2d\tMissDeadline\ttask(%2d)(%2d)\t--------------------\n", OSTime, FIFOTCBCurId, FIFOTCBCur_CtxSwCtr);
+                        //¼g Output.txt
+                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                            fprintf(Output_fp, "%2d\tMissDeadline\ttask(%2d)(%2d)\t--------------------\n", OSTime, FIFOTCBCurId, FIFOTCBCur_CtxSwCtr);
+                            fclose(Output_fp);
+                        }
                         system("pause");
                         exit(1);
                     }
@@ -1183,6 +1192,19 @@ void  OSTimeTick (void)
                 printf("\ttask(%2d)(%2d)", Time_Info.TCBNextId, Time_Info.TCBNext_CtxSwCtr);
             }
             printf("\t\t%2d\t%2d\t\t%2d\n", Time_Info.RESPONSE_TIME, Time_Info.PREEMPTION_TIME, Time_Info.OSTIMEDLY);
+
+            //¼g Output.txt
+            if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                fprintf(Output_fp, "%2d\tCompletion\ttask(%2d)(%2d)", OSTime, Time_Info.TCBCurId, Time_Info.TCBCur_CtxSwCtr);
+                if (Time_Info.TCBNextId == OS_TASK_IDLE_PRIO) {
+                    fprintf(Output_fp, "\ttask(%2d)     ", Time_Info.TCBNextId);
+                }
+                else {
+                    fprintf(Output_fp, "\ttask(%2d)(%2d)", Time_Info.TCBNextId, Time_Info.TCBNext_CtxSwCtr);
+                }
+                fprintf(Output_fp, "\t\t%2d\t%2d\t\t%2d\n", Time_Info.RESPONSE_TIME, Time_Info.PREEMPTION_TIME, Time_Info.OSTIMEDLY);
+                fclose(Output_fp);
+            }
         }
 #ifdef _FIFO_DEBUG_
         printf("\n\tFIFO now = {");
