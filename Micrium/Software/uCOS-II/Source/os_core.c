@@ -996,9 +996,11 @@ void  OSTimeTick (void)
 #if OS_TIME_GET_SET_EN > 0u
     OS_ENTER_CRITICAL();                                   /* Update the 32-bit tick counter               */
     OSTime++;
+#ifdef _FIFO_DEBUG_
     if (OSTime == 31) {
         system("pause");
     }
+#endif
 
 #ifdef _FIFO_DEBUG_
     printf("Tick = %d ===\n", OSTime);
@@ -1110,7 +1112,9 @@ void  OSTimeTick (void)
                             fprintf(Output_fp, "%2d\tMissDeadline\ttask(%2d)(%2d)\t--------------------\n", OSTime, FIFOTCBCurId, FIFOTCBCur_CtxSwCtr);
                             fclose(Output_fp);
                         }
+#ifdef _FIFO_DEBUG_
                         system("pause");
+#endif
                         exit(1);
                     }
                     

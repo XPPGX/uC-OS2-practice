@@ -149,15 +149,15 @@ int  main (void)
 *                  used.  The compiler should not generate any code for this statement.
 *********************************************************************************************************
 */
+/*M11102136 [PA1][PART-III]*/
 void task(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;
     while (1) {
-        //Execution Time沒有被模擬，所以會一直call OSTimeDly、印下面那行
-        //printf("Tick: %d, Hello from task%d, ID = %d\n", OSTime, task_data->TaskID, OSTCBCur->OSTCBId);
         OSTimeDly(task_data->TaskPeriodic);
     }
 }
+/*M11102136 [PA1][PART-III]*/
 
 void task1(void* p_arg) {
     task_para_set* task_data;
