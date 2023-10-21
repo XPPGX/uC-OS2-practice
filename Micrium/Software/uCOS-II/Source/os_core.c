@@ -1120,6 +1120,9 @@ void  OSTimeTick (void)
                     
                     FIFO_TEMP_ENQUEUE(ptcb);
                     OS_TASK_FIFO_Deadline[ptcb->OSTCBId] = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
+                    if (ptcb->OSTCBId == Time_Info.TCBCurId) {
+                        ptcb->OSTCBCtxSwCtr++;
+                    }
                 }
 #ifdef _FIFO_DEBUG_
                 printf("\n");
@@ -1935,10 +1938,16 @@ void  OS_Sched (void)
 
             //printf("OSTCBHighRdy %2d.addr = %p, OSTCBCur %2d.addr = %p\n", OSTCBHighRdy->OSTCBId, OSTCBHighRdy, OSTCBCur->OSTCBId, OSTCBCur);
             //if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
+            if (OSTCBHighRdy == OSTCBCur) {
+                printf("HIHI\n");
+                OSTCBCur->OSTCBCtxSwCtr++;
+            }
             if(OSTCBHighRdy != OSTCBCur){
                 
 #if OS_TASK_PROFILE_EN > 0u
                 //OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task      */ //程蔼纔舦task砆context switchΩ计
+                
+                //硂柑Τ惠璶э
                 OSTCBCur->OSTCBCtxSwCtr++;
 #endif          
                 OSCtxSwCtr++;                          /* Increment context switch counter             */ //俱╰参context switchΩ计

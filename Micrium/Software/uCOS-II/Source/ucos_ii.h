@@ -1508,7 +1508,7 @@ void OutFileInit(void);
 void InputFile(void);
 
 /*M11102136 [PA1][PART-III]*/
-//#define _FIFO_DEBUG_
+#define _FIFO_DEBUG_
 //
 //struct define
 typedef struct fifo_task {

@@ -1,5 +1,6 @@
 ﻿  os_core.c
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(1001,9): warning C4013: 'system' 未定義; 假設 extern 傳回整數
 D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(1022,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2393,48): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2485,5): warning C4013: 'free' 未定義; 假設 extern 傳回整數
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2402,48): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2494,5): warning C4013: 'free' 未定義; 假設 extern 傳回整數
   OS2.vcxproj -> D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

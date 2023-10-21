@@ -1,8 +1,8 @@
  1	Preemption	task(63)	task( 2)( 0)
  8	Completion	task( 2)( 0)	task( 1)( 0)		 7	 0		 9
 14	Completion	task( 1)( 0)	task( 3)( 0)		10	 4		 7
-15	Completion	task( 3)( 0)	task( 3)( 0)		11	10		 0
-16	Completion	task( 3)( 0)	task(63)     		 1	 0		10
+15	Completion	task( 3)( 0)	task( 3)( 1)		11	10		 0
+16	Completion	task( 3)( 1)	task(63)     		 1	 0		10
 17	Preemption	task(63)	task( 2)( 1)
 24	Completion	task( 2)( 1)	task( 1)( 1)		 7	 0		 9
-30	Completion	task( 1)( 1)	task( 3)( 1)		 9	 3		 8
+30	Completion	task( 1)( 1)	task( 3)( 2)		 9	 3		 8
