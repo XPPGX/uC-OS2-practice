@@ -1938,10 +1938,6 @@ void  OS_Sched (void)
 
             //printf("OSTCBHighRdy %2d.addr = %p, OSTCBCur %2d.addr = %p\n", OSTCBHighRdy->OSTCBId, OSTCBHighRdy, OSTCBCur->OSTCBId, OSTCBCur);
             //if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
-            if (OSTCBHighRdy == OSTCBCur) {
-                printf("HIHI\n");
-                OSTCBCur->OSTCBCtxSwCtr++;
-            }
             if(OSTCBHighRdy != OSTCBCur){
                 
 #if OS_TASK_PROFILE_EN > 0u

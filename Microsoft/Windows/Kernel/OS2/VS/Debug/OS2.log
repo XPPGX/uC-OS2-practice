@@ -1,6 +1,25 @@
-﻿  os_core.c
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(1001,9): warning C4013: 'system' 未定義; 假設 extern 傳回整數
+﻿  os_cpu_c.c
+  os_core.c
 D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(1022,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2402,48): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2494,5): warning C4013: 'free' 未定義; 假設 extern 傳回整數
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2398,48): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2490,5): warning C4013: 'free' 未定義; 假設 extern 傳回整數
+  os_dbg_r.c
+  os_flag.c
+  os_mbox.c
+  os_mem.c
+  os_mutex.c
+  os_q.c
+  os_sem.c
+  os_task.c
+  os_time.c
+  os_tmr.c
+  app_hooks.c
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\app_hooks.c(125,27): warning C4013: 'atoi' 未定義; 假設 extern 傳回整數
+  main.c
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(107,16): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(107,14): warning C4047: '=': 'OS_STK **' 與 'int' 間接取值的層級不同
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(111,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(118,29): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(90,17): warning C4101: 'os_err': 未參考的區域變數
+  正在產生程式碼...
   OS2.vcxproj -> D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
