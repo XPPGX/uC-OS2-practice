@@ -141,7 +141,7 @@ void InputFile() {
         }
         /*Initial Priority*/
         /*M11102136*/
-        TaskParameter[j].TaskPriority = j + 1; //just an example
+        TaskParameter[j].TaskPriority = TaskParameter[j].TaskPeriodic; //just an example
         /*M11102136*/
         j++;
     }

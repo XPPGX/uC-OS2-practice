@@ -1,10 +1,4 @@
 ﻿  os_core.c
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(891,20): warning C4477: 'printf' : 格式字串 '%13x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'os_tcb *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(891,20): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 3 的類型為 'OS_TCB *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(891,20): warning C4477: 'printf' : 格式字串 '%13x' 需要 'unsigned int' 類型的引數，但 variadic 引數 4 的類型為 'os_tcb *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(986,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2201,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 2 的類型為 'OS_TCB *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2203,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2204,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'OS_TCB *'
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2205,16): warning C4477: 'printf' : 格式字串 '%8x' 需要 'unsigned int' 類型的引數，但 variadic 引數 1 的類型為 'os_tcb *'
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(966,9): warning C4013: 'system' 未定義; 假設 extern 傳回整數
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(977,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
   OS2.vcxproj -> D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

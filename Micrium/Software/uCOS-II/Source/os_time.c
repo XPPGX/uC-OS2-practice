@@ -59,26 +59,26 @@ void  OSTimeDly (INT32U ticks)
     OS_CPU_SR  cpu_sr = 0u;
 #endif
 
-
-
-    if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
-        return;
-    }
-    if (OSLockNesting > 0u) {                    /* See if called with scheduler locked                */
-        return;
-    }
-    if (ticks > 0u) {                            /* 0 means no delay!                                  */
-        OS_ENTER_CRITICAL();
-        y            =  OSTCBCur->OSTCBY;        /* Delay current task                                 */
-        OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
-        OS_TRACE_TASK_SUSPENDED(OSTCBCur);
-        if (OSRdyTbl[y] == 0u) {
-            OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
+    if (RM_Info[OSTCBCur->OSTCBId - 1].REMAIN_TIME == 0) {
+        if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
+            return;
         }
-        OSTCBCur->OSTCBDly = ticks;              /* Load ticks in TCB                                  */
-        OS_TRACE_TASK_DLY(ticks);
-        OS_EXIT_CRITICAL();
-        OS_Sched();                              /* Find next task to run!                             */
+        if (OSLockNesting > 0u) {                    /* See if called with scheduler locked                */
+            return;
+        }
+        if (ticks > 0u) {                            /* 0 means no delay!                                  */
+            OS_ENTER_CRITICAL();
+            y = OSTCBCur->OSTCBY;        /* Delay current task                                 */
+            OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
+            OS_TRACE_TASK_SUSPENDED(OSTCBCur);
+            if (OSRdyTbl[y] == 0u) {
+                OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
+            }
+            //OSTCBCur->OSTCBDly = ticks;              /* Load ticks in TCB                                  */
+            OS_TRACE_TASK_DLY(ticks);
+            OS_EXIT_CRITICAL();
+            OS_Sched();                              /* Find next task to run!                             */
+        }
     }
 }
 

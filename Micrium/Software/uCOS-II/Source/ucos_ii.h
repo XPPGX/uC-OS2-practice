@@ -827,6 +827,8 @@ extern  INT8U   const     OSUnMapTbl[256];          /* Priority->Index    lookup
 *********************************************************************************************************
 */
 
+
+
 /*
 *********************************************************************************************************
 *                                            MISCELLANEOUS
@@ -1501,11 +1503,27 @@ void          OSIntCtxSw              (void);
 void          OSCtxSw                 (void);
 #endif
 
-
-
-
 void OutFileInit(void);
 void InputFile(void);
+
+/*M11102136 [PA1][PART-II]*/
+#define _RMS_DEBUG_
+typedef struct rms_task_info{
+    int REMAIN_TIME;
+    int Deadline;
+}RMS_TASK_INFO;
+
+typedef struct time_info {
+    int Finished_Job;
+    int ResponseTime;
+    int PreemptionTime;
+    int OSTimeDly;
+}Time_Info;
+
+OS_EXT RMS_TASK_INFO* RM_Info;
+OS_EXT Time_Info* Record;
+/*M11102136 [PA1][PART-II]*/
+
 /*
 *********************************************************************************************************
 *                                   LOOK FOR MISSING #define CONSTANTS
