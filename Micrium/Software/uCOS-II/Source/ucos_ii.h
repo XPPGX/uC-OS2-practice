@@ -112,7 +112,7 @@ task_para_set TaskParameter[OS_MAX_TASKS];
 
 #define  OS_ASCII_NUL            (INT8U)0
 
-#define  OS_PRIO_SELF                0xFFu              /* Indicate SELF priority                      */
+#define  OS_PRIO_SELF                0xFFu              /* Indicate SELF priority                      */ //如果prio是這個，則指定prio = OSTCBCur->OSTCBPrio，方便寫code用的
 #define  OS_PRIO_MUTEX_CEIL_DIS      0xFFu              /* Disable mutex priority ceiling promotion    */
 
 #if OS_TASK_STAT_EN > 0u
