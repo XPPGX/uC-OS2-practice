@@ -105,13 +105,17 @@ int  main (void)
 
     /*Dynamic Create the Stack size*/
     Task_STK = malloc(TASK_NUMBER * sizeof(int*));
+
+    /*M11102136 [PA1][PART-II]*/
     RM_Info = malloc(TASK_NUMBER * sizeof(RMS_TASK_INFO));
     Record = malloc(TASK_NUMBER * sizeof(Time_Info));
+    /*M11102136 [PA1][PART-II]*/
+
     /*for each pointer, allocate storage for an array of ints*/
     int n;
     for (n = 0; n < TASK_NUMBER; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
-
+        /*M11102136 [PA1][PART-II]*/
         RM_Info[n].REMAIN_TIME          = 0;
         RM_Info[n].Deadline             = 0;
 
@@ -130,6 +134,7 @@ int  main (void)
             TASK_STACKSIZE,
             &TaskParameter[n],
             (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+        /*M11102136 [PA1][PART-II]*/
     }
 
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
@@ -156,6 +161,7 @@ int  main (void)
 *********************************************************************************************************
 */
 
+/*M11102136 [PA1][PART-II]*/
 void task(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;
@@ -164,6 +170,7 @@ void task(void* p_arg) {
         OSTimeDly(task_data->TaskPeriodic);
     }
 }
+/*M11102136 [PA1][PART-II]*/
 
 void task1(void* p_arg) {
     task_para_set* task_data;

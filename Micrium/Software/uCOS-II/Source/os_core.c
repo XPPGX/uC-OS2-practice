@@ -711,6 +711,7 @@ void  OSIntExit (void)
                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
                 if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
 #if OS_TASK_PROFILE_EN > 0u
+                    /*M11102136 [PA1][PART-II]*/
                     if (OSPrioCur == OS_TASK_IDLE_PRIO) {
                         printf("%2d\tPreemption\ttask(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, Record[OSTCBHighRdy->OSTCBId - 1].Finished_Job);
                         if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
@@ -727,7 +728,7 @@ void  OSIntExit (void)
                             }
                         }
                     }
-                    
+                    /*M11102136 [PA1][PART-II]*/
                     
                     OSTCBCur->OSTCBCtxSwCtr++;
 #endif
@@ -975,11 +976,11 @@ void  OSTimeTick (void)
 
     CompletionFlag = 0;//Init CompletionFlag per TimeTick
 
-
+#ifdef _RMS_DEBUG_
     if (OSTime == 31) {
         system("pause");
     }
-#ifdef _RMS_DEBUG_
+
     printf("\n====Time %2d, now Task %2d\n", OSTime, OSTCBCur->OSTCBId);
 #endif
 
@@ -1046,6 +1047,9 @@ void  OSTimeTick (void)
                 }
             }
         }
+        /*M11102136 [PA1][PART-II]*/
+
+        /*M11102136 [PA1][PART-II]*/
         //Deadline 北
         ptcb = OSTCBList;
         while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {
@@ -1123,6 +1127,7 @@ void  OSTimeTick (void)
                     Record[ptcb->OSTCBId - 1].Arrive_At_OS_TimeTick = OSTime;
 
                     //秨﹍Arrive穦ノDelay TimeぇJob arrive常パdeadline北
+                    /*M11102136 [PA1][PART-II]*/
 #ifdef _RMS_DEBUG_
                     printf("\tTime : %2d, Task %2d ready\n", OSTime, ptcb->OSTCBId);
 #endif
@@ -1147,6 +1152,7 @@ void  OSTimeTick (void)
             OS_EXIT_CRITICAL();
         }
 
+        /*M11102136 [PA1][PART-II]*/
         if (CompletionFlag == 1) {
             //魁Timing
             Record[OSTCBCur->OSTCBId - 1].PreemptionTime = Record[OSTCBCur->OSTCBId - 1].ResponseTime - TaskParameter[OSTCBCur->OSTCBId - 1].TaskExecutionTime;
@@ -1183,6 +1189,7 @@ void  OSTimeTick (void)
             }
             Record[OSTCBCur->OSTCBId - 1].Finished_Job++;
         }
+        /*M11102136 [PA1][PART-II]*/
     }
 }
 
@@ -1893,15 +1900,6 @@ void  OS_Sched (void)
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
                 
 #if OS_TASK_PROFILE_EN > 0u
-                //printf("%2d\tCompletion\ttask(%2d)(%2d)\t", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
-                //if (OSPrioHighRdy == OS_TASK_IDLE_PRIO) {
-                //    printf("task(%2d)\t", OS_TASK_IDLE_PRIO);
-                //}
-                //else {
-                //    printf("task(%2d)(%2d)\t", OSTCBHighRdy->OSTCBId, Record[OSTCBHighRdy->OSTCBId - 1].Finished_Job);
-                //}
-                //OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task      */ //程蔼纔舦task砆context switchΩ计
-                //Record[OSTCBCur->OSTCBId - 1].Finished_Job ++;
                 OSTCBCur->OSTCBCtxSwCtr++;
 #endif          
                 OSCtxSwCtr++;                          /* Increment context switch counter             */ //俱╰参context switchΩ计
@@ -2320,7 +2318,7 @@ INT8U  OS_TCBInit (INT8U    prio,
         }
         
         OSTCBList               = ptcb;
-
+        /*M11102136 [PA1][PART-II]*/
         if (id < OS_TASK_IDLE_PRIO && TaskParameter[id - 1].TaskArriveTime > 0) {
             //Do nothing
         }
@@ -2335,6 +2333,8 @@ INT8U  OS_TCBInit (INT8U    prio,
                 printf("Time %2d, Task %2d ready\n", OSTime, id);
             }
         }
+        /*M11102136 [PA1][PART-II]*/
+
         //OSRdyGrp               |= ptcb->OSTCBBitY;         /* Make task ready to run                   */
         //OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
         
