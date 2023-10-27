@@ -396,7 +396,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         !!  沒有把已刪除的task的TCB內的stack清空  !!
         */
 #endif
-
+        
         psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */
         err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);
         if (err == OS_ERR_NONE) {

@@ -1507,7 +1507,7 @@ void OutFileInit(void);
 void InputFile(void);
 
 /*M11102136 [PA1][PART-II]*/
-#define _RMS_DEBUG_
+//#define _RMS_DEBUG_
 typedef struct rms_task_info{
     int REMAIN_TIME;
     int Deadline;
@@ -1515,6 +1515,7 @@ typedef struct rms_task_info{
 
 typedef struct time_info {
     int Finished_Job;
+    int Arrive_At_OS_TimeTick;
     int ResponseTime;
     int PreemptionTime;
     int OSTimeDly;
@@ -1522,6 +1523,7 @@ typedef struct time_info {
 
 OS_EXT RMS_TASK_INFO* RM_Info;
 OS_EXT Time_Info* Record;
+OS_EXT int CompletionFlag;
 /*M11102136 [PA1][PART-II]*/
 
 /*

@@ -112,13 +112,14 @@ int  main (void)
     for (n = 0; n < TASK_NUMBER; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
 
-        RM_Info[n].REMAIN_TIME   = 0;
-        RM_Info[n].Deadline      = 0;
+        RM_Info[n].REMAIN_TIME          = 0;
+        RM_Info[n].Deadline             = 0;
 
-        Record[n].Finished_Job   = 0;
-        Record[n].ResponseTime   = 0;
-        Record[n].PreemptionTime = 0;
-        Record[n].OSTimeDly      = 0;
+        Record[n].Finished_Job          = 0;
+        Record[n].Arrive_At_OS_TimeTick = 0;
+        Record[n].ResponseTime          = 0;
+        Record[n].PreemptionTime        = 0;
+        Record[n].OSTimeDly             = 0;
 
         OSTaskCreateExt(task,
             &TaskParameter[n],
