@@ -1072,7 +1072,9 @@ void  OSTimeTick (void)
                             fprintf(Output_fp, "%2d\tMissDeadline\ttask(%2d)(%2d)\t-------------------\n", OSTime, ptcb->OSTCBId, Record[ptcb->OSTCBId - 1].Finished_Job);
                             fclose(Output_fp);
                         }
+#ifdef _RMS_DEBUG_
                         system("pause");
+#endif
                         exit(1);
                     }
                     else {

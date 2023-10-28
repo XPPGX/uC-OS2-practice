@@ -1,4 +1,6 @@
 ﻿  os_core.c
 D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(994,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(1075,25): warning C4013: 'system' 未定義; 假設 extern 傳回整數
+  app_hooks.c
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\app_hooks.c(125,27): warning C4013: 'atoi' 未定義; 假設 extern 傳回整數
+  正在產生程式碼...
   OS2.vcxproj -> D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe
