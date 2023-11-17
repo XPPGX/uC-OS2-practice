@@ -63,11 +63,12 @@ extern "C" {
 *********************************************************************************************************
 */
 /*End time for the simulation*/
-#define SYSTEM_END_TIME 30
+#define SYSTEM_END_TIME 40
 /*Input File*/
     FILE* fp;
 #define INPUT_FILE_NAME "./TaskSet.txt"
 #define OUTPUT_FILE_NAME "./Output.txt"
+#define APERIODIC_FILE_NAME "./Aperiodicjobs.txt"
 #define MAX 20              //Task maximum number
 #define INFO 4              //information of task
 /*Input File*/
@@ -1506,6 +1507,16 @@ void          OSCtxSw                 (void);
 
 void OutFileInit(void);
 void InputFile(void);
+
+/*M11102136[PA2-I]*/
+typedef struct edf_task_info {
+    int RemainTime;
+    int DeadLine;
+}EDF_TASK_INFO;
+
+OS_EXT int ArriveTime;
+OS_EXT EDF_TASK_INFO* EDF_INFO;
+/*M11102136[PA2-I]*/
 /*
 *********************************************************************************************************
 *                                   LOOK FOR MISSING #define CONSTANTS

@@ -63,6 +63,7 @@ static  OS_STK  StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE];
 *                                         FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
+static void task(void* p_arg);
 static void task1(void* p_arg);
 static void task2(void* p_arg);
 static  void  StartupTask (void  *p_arg);
@@ -109,47 +110,18 @@ int  main (void)
     for (n = 0; n < TASK_NUMBER; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
     }
-    OSTaskCreateExt(task1,
-        &TaskParameter[0],
-        &Task_STK[0][TASK_STACKSIZE - 1],
-        TaskParameter[0].TaskPriority,
-        TaskParameter[0].TaskID,
-        &Task_STK[0][0],
-        TASK_STACKSIZE,
-        &TaskParameter[0],
-        (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+    for (int i = 0; i < TASK_NUMBER; i++) {
+        OSTaskCreateExt(task,
+            &TaskParameter[i],
+            &Task_STK[i][TASK_STACKSIZE - 1],
+            TaskParameter[i].TaskPriority,
+            TaskParameter[i].TaskID,
+            &Task_STK[i][0],
+            TASK_STACKSIZE,
+            &TaskParameter[i],
+            (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+    }
 
-    OSTaskCreateExt(task2,
-        &TaskParameter[1],
-        &Task_STK[1][TASK_STACKSIZE - 1],
-        TaskParameter[1].TaskPriority,
-        TaskParameter[1].TaskID,
-        &Task_STK[1][0],
-        TASK_STACKSIZE,
-        &TaskParameter[1],
-        (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-//    OSTaskCreateExt( StartupTask,                               /* Create the startup task                              */
-//                     0,
-//                    &StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE - 1u],
-//                     APP_CFG_STARTUP_TASK_PRIO,
-//                     APP_CFG_STARTUP_TASK_PRIO,
-//                    &StartupTaskStk[0u],
-//                     APP_CFG_STARTUP_TASK_STK_SIZE,
-//                     0u,
-//                    (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-//
-//#if OS_TASK_NAME_EN > 0u
-//    OSTaskNameSet(         APP_CFG_STARTUP_TASK_PRIO,
-//                  (INT8U *)"Startup Task",
-//                           &os_err);
-//#endif
-
-    /*M11102136*/
-    //printf("Tick\t\tCurrentTask ID\t\t\tNextTask ID\t\tNumber of ctx switches\n");
-    /*M11102136*/
-
-    /*printf("OS Task Number = %d\n", OSTaskCtr);*/
-    
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
 
    
@@ -175,6 +147,16 @@ int  main (void)
 *                  used.  The compiler should not generate any code for this statement.
 *********************************************************************************************************
 */
+
+void task(void* p_arg) {
+    task_para_set* task_data;
+    task_data = p_arg;
+    while (1) {
+        printf("Time = %2d, Task.ID = %2d\n", OSTime, OSTCBCur->OSTCBId);
+        OSTimeDly(task_data->TaskPeriodic);
+    }
+}
+
 void task1(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;

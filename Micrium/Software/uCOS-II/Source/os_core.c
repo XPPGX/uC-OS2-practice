@@ -885,13 +885,6 @@ void  OSStart (void)
         OSPrioCur     = OSPrioHighRdy;
         OSTCBHighRdy  = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
         OSTCBCur      = OSTCBHighRdy;
-        /*M11102136 [PA1][PART-I]*/
-        printf("================TCB linked list================\n");
-        printf("Task\tPrev_TCB_addr\tTCB_addr\tNext_TCB_addr\n");
-        for (OS_TCB* TCBIterPointer = OSTCBList; TCBIterPointer != NULL; TCBIterPointer = TCBIterPointer->OSTCBNext) {
-            printf("%2d\t%13x\t%8x\t%13x\n", TCBIterPointer->OSTCBPrio, TCBIterPointer->OSTCBPrev, TCBIterPointer, TCBIterPointer->OSTCBNext);
-        }
-        /*M11102136 [PA1][PART-I]*/
 
         /*printf("%d\t\t***********\t\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSCtxSwCtr);
         if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
@@ -1020,6 +1013,9 @@ void  OSTimeTick (void)
             if (ptcb->OSTCBDly != 0u) {                    /* No, Delayed or waiting for event with TO     */
                 ptcb->OSTCBDly--;                          /* Decrement nbr of ticks to end of delay       */
                 if (ptcb->OSTCBDly == 0u) {                /* Check for timeout                            */
+
+                    ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;
+                    
 
                     if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) != OS_STAT_RDY) {
                         ptcb->OSTCBStat  &= (INT8U)~(INT8U)OS_STAT_PEND_ANY;   /* Yes, Clear status flag   */
@@ -2113,7 +2109,11 @@ INT8U  OS_TCBInit (INT8U    prio,
         ptcb->OSTCBStat          = OS_STAT_RDY;            /* Task is ready to run                     */
         ptcb->OSTCBStatPend      = OS_STAT_PEND_OK;        /* Clear pend status                        */
         ptcb->OSTCBDly           = 0u;                     /* Task is not delayed                      */
-
+        if (ArriveTime > 0) {
+            ptcb->OSTCBStat      = OS_STAT_SUSPEND;
+            ptcb->OSTCBDly       = ArriveTime;
+            printf("task %2d is suspended\n", id);
+        }
 #if OS_TASK_CREATE_EXT_EN > 0u
         ptcb->OSTCBExtPtr        = pext;                   /* Store pointer to TCB extension           */
         ptcb->OSTCBStkSize       = stk_size;               /* Store stack size                         */
@@ -2199,20 +2199,26 @@ INT8U  OS_TCBInit (INT8U    prio,
         if (OSTCBList != (OS_TCB *)0) {
             OSTCBList->OSTCBPrev = ptcb;
         }
-        /*M11102136 [PA1][PART-I]*/
-        printf("Task[%3d] created, TCB Address%8x\n", ptcb->OSTCBPrio, ptcb);
-        printf("------After TCB[%2d] begin linked------\n", ptcb->OSTCBPrio);
-        printf("Previous TCB point to address %8x\n", ptcb->OSTCBPrev);
-        printf("Current  TCB point to address %8x\n", ptcb);
-        printf("Next     TCB point to address %8x\n", ptcb->OSTCBNext);
-        printf("\n");
-        /*M11102136 [PA1][PART-I]*/
-        OSTCBList               = ptcb;
-        OSRdyGrp               |= ptcb->OSTCBBitY;         /* Make task ready to run                   */
-        OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+
+        OSTCBList = ptcb;
+        /*M11102136 [PA2][PART-I]*/
+        if (prio == OS_TASK_IDLE_PRIO) {
+            OSRdyGrp |= ptcb->OSTCBBitY;
+            OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+            OS_TRACE_TASK_READY(ptcb);
+            printf("IDLE task is created and ready\n");
+        }
+        if (ArriveTime == 0 && prio != OS_TASK_IDLE_PRIO) {
+            OSRdyGrp |= ptcb->OSTCBBitY;
+            OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+            OS_TRACE_TASK_READY(ptcb);
+            printf("Task %2d is created and ready\n", id);
+        }
+        /*M11102136 [PA2][PART-I]*/
+        
         OSTaskCtr++;                                       /* Increment the #tasks counter             */
-        OS_TRACE_TASK_READY(ptcb);
         OS_EXIT_CRITICAL();
+
         return (OS_ERR_NONE);
     }
     OS_EXIT_CRITICAL();
