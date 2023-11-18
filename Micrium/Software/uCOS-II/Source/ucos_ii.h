@@ -669,6 +669,9 @@ typedef struct os_tcb {
 #if OS_TASK_REG_TBL_SIZE > 0u
     INT32U           OSTCBRegTbl[OS_TASK_REG_TBL_SIZE];
 #endif
+
+    int             RemainTime;
+    int             DeadLine;
 } OS_TCB;
 
 
@@ -1509,13 +1512,17 @@ void OutFileInit(void);
 void InputFile(void);
 
 /*M11102136[PA2-I]*/
+#define EDF_enqueue_DEBUG
+#define EDF_dequeue_DEBUG
 typedef struct edf_task_info {
-    int RemainTime;
-    int DeadLine;
+    OS_TCB* ptcb;
+    struct edf_task_info* Next;
 }EDF_TASK_INFO;
 
 OS_EXT int ArriveTime;
-OS_EXT EDF_TASK_INFO* EDF_INFO;
+OS_EXT EDF_TASK_INFO* EDF_TASK_HEAD;
+void EDF_enqueue(OS_TCB* _ptcb);
+void EDF_dequeue();
 /*M11102136[PA2-I]*/
 /*
 *********************************************************************************************************

@@ -109,6 +109,7 @@ int  main (void)
     int n;
     for (n = 0; n < TASK_NUMBER; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
+
     }
     for (int i = 0; i < TASK_NUMBER; i++) {
         OSTaskCreateExt(task,
@@ -152,7 +153,7 @@ void task(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;
     while (1) {
-        printf("Time = %2d, Task.ID = %2d\n", OSTime, OSTCBCur->OSTCBId);
+        while (OSTCBCur->RemainTime > 0);
         OSTimeDly(task_data->TaskPeriodic);
     }
 }
