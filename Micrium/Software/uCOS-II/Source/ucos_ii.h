@@ -1514,6 +1514,7 @@ void InputFile(void);
 /*M11102136[PA2-I]*/
 #define EDF_enqueue_DEBUG
 #define EDF_dequeue_DEBUG
+#define EDF_ShowList_DEBUG
 typedef struct edf_task_info {
     OS_TCB* ptcb;
     struct edf_task_info* Next;
@@ -1521,6 +1522,11 @@ typedef struct edf_task_info {
 
 OS_EXT int ArriveTime;
 OS_EXT EDF_TASK_INFO* EDF_TASK_HEAD;
+OS_EXT EDF_TASK_INFO* EDF_TASK_WaitForEnqueueHEAD;
+OS_EXT EDF_TASK_INFO* EDF_TASK_WaitForEnqueueTAIL;
+OS_EXT int TaskFinishFlag;
+
+void EDF_getEnqueueTasks(OS_TCB* _ptcb);
 void EDF_enqueue(OS_TCB* _ptcb);
 void EDF_dequeue();
 /*M11102136[PA2-I]*/

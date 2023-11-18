@@ -715,20 +715,12 @@ void  OSIntExit (void)
                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
                 if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
 #if OS_TASK_PROFILE_EN > 0u
-                    /*M11102136*/
-                    //OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task  */
+                    
                     OSTCBCur->OSTCBCtxSwCtr++;
-                    /*printf("%d\t\ttask(%2d)\t\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSPrioCur, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBId, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBCtxSwCtr, OSCtxSwCtr);
-                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                        fprintf(Output_fp, "%d\t\ttask(%2d)\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSPrioCur, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBId, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBCtxSwCtr, OSCtxSwCtr);
-                        fclose(Output_fp);
-                    }*/
-                    /*M11102136*/
+                    
 #endif
                     OSCtxSwCtr++;                          /* Keep track of the number of ctx switches */
-                    //printf("interrupt CtxSw => OSCtxSwCtr = %d\n", OSCtxSwCtr);
                     
-                    /*printf("currentTask = %d, nextTask = %d\n\n", OS_TASK_IDLE_PRIO, OSTCBPrioTbl[OSPrioHighRdy]->OSTCBId);*/
 #if OS_TASK_CREATE_EXT_EN > 0u
 #if defined(OS_TLS_TBL_SIZE) && (OS_TLS_TBL_SIZE > 0u)
                     OS_TLS_TaskSw();
@@ -976,6 +968,9 @@ void  OSTimeTick (void)
 #if OS_TIME_GET_SET_EN > 0u
     OS_ENTER_CRITICAL();                                   /* Update the 32-bit tick counter               */
     OSTime++;
+    if (OSTime == 41) {
+        printf("Finish\n");
+    }
     printf("===============================\n");
     printf("OSTime = %2d | NowTask = %2d\n", OSTime, OSTCBCur->OSTCBId);
     OS_TRACE_TICK_INCREMENT(OSTime);
@@ -1012,37 +1007,56 @@ void  OSTimeTick (void)
             return;
         }
 #endif
-        //控制RemainTime
+        //倒數RemainTime，把RemainTime = 0的Task移出EDF Linked list
+        TaskFinishFlag = 0;
         if (EDF_TASK_HEAD != NULL) {
             OS_ENTER_CRITICAL();
             if (EDF_TASK_HEAD->ptcb->RemainTime != 0) {
                 EDF_TASK_HEAD->ptcb->RemainTime--;
+                if (EDF_TASK_HEAD->ptcb->RemainTime == 0) {
+                    EDF_dequeue();
+                    TaskFinishFlag = 2;
+                }
             }
             OS_EXIT_CRITICAL();
         }
-        ////控制Deadline
-        //ptcb = OSTCBList;
-        //while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {
-        //    OS_ENTER_CRITICAL();
-        //    if (ptcb->DeadLine > 0) {
-        //        ptcb->DeadLine--;
-        //        if (ptcb->DeadLine == 0) {
-        //            EDF_enqueue(ptcb);
-        //        }
-        //    }
-        //    ptcb = ptcb->OSTCBNext;
-        //    OS_EXIT_CRITICAL();
-        //}
-
-        //印出當前EDF中，所有Task的狀態
-        printf("\tEDF linked list = {\n");
-        if (EDF_TASK_HEAD != NULL) {
-            EDF_TASK_INFO* EDF_Iter;
-            for (EDF_Iter = EDF_TASK_HEAD ; EDF_Iter != NULL ; EDF_Iter = EDF_Iter->Next) {
-                printf("\t\tTask[%2d] = {RemainTime = %2d, Deadline = %2d}\n", EDF_Iter->ptcb->OSTCBId, EDF_Iter->ptcb->RemainTime, EDF_Iter->ptcb->DeadLine);
+        if (OSTime == 11) {
+            printf("HI\n");
+        }
+        //倒數Deadline，把準備要enqueue的Task都先記錄起來
+        EDF_TASK_WaitForEnqueueHEAD = NULL;
+        EDF_TASK_WaitForEnqueueTAIL = NULL;
+        ptcb = OSTCBList;
+        while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {
+            OS_ENTER_CRITICAL();
+            if (ptcb->DeadLine > 0) {
+                ptcb->DeadLine--;
+                if (ptcb->DeadLine == 0) {
+                    if (ptcb->RemainTime > 0) {
+                        printf("MissDeadline\n");
+                        system("pause");
+                    }
+                    else {
+                        EDF_getEnqueueTasks(ptcb);
+                    }
+                }
+            }
+            ptcb = ptcb->OSTCBNext;
+            OS_EXIT_CRITICAL();
+        }
+        //把剛剛記錄到準備要Enqueue的Task，在這裡全部都Enqueue。
+        if (EDF_TASK_WaitForEnqueueHEAD != NULL) {
+            EDF_TASK_INFO* Iter;
+            EDF_TASK_INFO* deleteTarget;
+            for (Iter = EDF_TASK_WaitForEnqueueHEAD; Iter != NULL; ) {
+                EDF_enqueue(Iter->ptcb);
+                deleteTarget = Iter;
+                Iter = Iter->Next;
+                free(deleteTarget);
             }
         }
-        printf("\t}\n");
+
+
         /*每個Tick都在檢查有哪個task已經變成ready，要把他們對應的Ready Table位置設置成1
         每個Tick都會掃過所有TCB*/
         ptcb = OSTCBList;                                  /* Point at first TCB in TCB list               */ //OSTCBList
@@ -1073,7 +1087,19 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
+#ifdef EDF_ShowList_DEBUG
+        //印出當前EDF中，所有Task的狀態
+        printf("\tEDF linked list = {\n");
+        if (EDF_TASK_HEAD != NULL) {
+            EDF_TASK_INFO* EDF_Iter;
+            for (EDF_Iter = EDF_TASK_HEAD; EDF_Iter != NULL; EDF_Iter = EDF_Iter->Next) {
+                printf("\t\tTask[%2d] = {RemainTime = %2d, Deadline = %2d}\n", EDF_Iter->ptcb->OSTCBId, EDF_Iter->ptcb->RemainTime, EDF_Iter->ptcb->DeadLine);
+            }
+        }
+        printf("\t}\n");
     }
+#endif
+
 }
 
 
@@ -1828,11 +1854,16 @@ static  void  OS_SchedNew (void)
 
     //y             = OSUnMapTbl[OSRdyGrp];
     //OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
-    if (EDF_TASK_HEAD == NULL) {
-        OSPrioHighRdy = OS_TASK_IDLE_PRIO;
+    if (TaskFinishFlag > 0) {
+        TaskFinishFlag--;
     }
-    else {
-        OSPrioHighRdy = EDF_TASK_HEAD->ptcb->OSTCBPrio;
+    if (TaskFinishFlag == 0) {
+        if (EDF_TASK_HEAD == NULL) {
+            OSPrioHighRdy = OS_TASK_IDLE_PRIO;
+        }
+        else {
+            OSPrioHighRdy = EDF_TASK_HEAD->ptcb->OSTCBPrio;
+        }
     }
 #else                                            /* We support up to 256 tasks                         */
     INT8U     y;
@@ -2232,6 +2263,35 @@ INT8U  OS_TCBInit (INT8U    prio,
     return (OS_ERR_TASK_NO_MORE_TCB);
 }
 /*M11102136 [PA2][PART-I]*/
+void EDF_getEnqueueTasks(OS_TCB* _ptcb) {
+    if (EDF_TASK_WaitForEnqueueHEAD == NULL) {
+        EDF_TASK_WaitForEnqueueHEAD         = (EDF_TASK_INFO*)malloc(sizeof(EDF_TASK_INFO));
+        EDF_TASK_WaitForEnqueueHEAD->ptcb   = _ptcb;
+        EDF_TASK_WaitForEnqueueHEAD->Next   = NULL;
+        
+        EDF_TASK_WaitForEnqueueTAIL         = EDF_TASK_WaitForEnqueueHEAD;
+#ifdef EDF_enqueue_DEBUG
+        printf("\tNew_Task.ID = %2d, is waiting for enqueue[1]\n", EDF_TASK_WaitForEnqueueHEAD->ptcb->OSTCBId);
+#endif
+    }
+    else {
+        //新創一個node
+        EDF_TASK_INFO* New_TASK_NODE = (EDF_TASK_INFO*)malloc(sizeof(EDF_TASK_INFO));
+        New_TASK_NODE->ptcb = _ptcb;
+        New_TASK_NODE->Next = NULL;
+
+        //把Tail->next 指向 New_TASK_NODE
+        EDF_TASK_WaitForEnqueueTAIL->Next   = New_TASK_NODE;
+        
+        //Tail往下走一格
+        EDF_TASK_WaitForEnqueueTAIL         = EDF_TASK_WaitForEnqueueTAIL->Next;
+#ifdef EDF_enqueue_DEBUG
+        printf("\tNew_Task.ID = %2d, is waiting for enqueue[2]\n", EDF_TASK_WaitForEnqueueTAIL->ptcb->OSTCBId);
+#endif
+
+    }
+}
+
 void EDF_enqueue(OS_TCB* _ptcb) {
     if (EDF_TASK_HEAD == NULL) {
         EDF_TASK_HEAD                   = (EDF_TASK_INFO*)malloc(sizeof(EDF_TASK_INFO));
@@ -2320,6 +2380,7 @@ void EDF_enqueue(OS_TCB* _ptcb) {
 }
 
 void EDF_dequeue() {
+    //Dequeue不會改變OSTCBCur，所以還是可以讓執行完畢的task去呼叫Sched
     if (EDF_TASK_HEAD == NULL) {
 #ifdef EDF_dequeue_DEBUG
         printf("\tEDF_TASK_HEAD is NULL\n");
@@ -2330,7 +2391,7 @@ void EDF_dequeue() {
         EDF_TASK_HEAD = EDF_TASK_HEAD->Next;
         free(DelTargetNode);
 #ifdef EDF_dequeue_DEBUG
-        printf("\tEDF_TASK_HEAD is steped, and delete original head\n");
+        printf("\tEDF_TASK_HEAD is stepped, and delete original head\n");
 #endif
     }
 }

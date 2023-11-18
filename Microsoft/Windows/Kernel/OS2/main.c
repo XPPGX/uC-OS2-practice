@@ -153,7 +153,7 @@ void task(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;
     while (1) {
-        while (OSTCBCur->RemainTime > 0);
+        while (OSTCBCur->RemainTime > 0 && TaskFinishFlag == 0);
         OSTimeDly(task_data->TaskPeriodic);
     }
 }
