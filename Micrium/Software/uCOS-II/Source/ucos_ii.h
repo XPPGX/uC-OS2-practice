@@ -1511,7 +1511,7 @@ void          OSCtxSw                 (void);
 void OutFileInit(void);
 void InputFile(void);
 
-/*M11102136[PA2-I]*/
+/*M11102136[PA2][PART-I]*/
 //#define PrintTimeTick
 //#define PrintSchedCalled
 //#define EDF_enqueue_DEBUG
@@ -1542,7 +1542,7 @@ OS_EXT RECORD_INFO* Timing_INFO;
 void EDF_getEnqueueTasks(OS_TCB* _ptcb);
 void EDF_enqueue(OS_TCB* _ptcb);
 void EDF_dequeue();
-/*M11102136[PA2-I]*/
+/*M11102136[PA2][PART-I]*/
 /*
 *********************************************************************************************************
 *                                   LOOK FOR MISSING #define CONSTANTS

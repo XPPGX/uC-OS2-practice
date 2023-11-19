@@ -1035,6 +1035,7 @@ void  OSTimeTick (void)
             return;
         }
 #endif
+        /*M11102136 [PA2][PART-I]*/
         //倒數RemainTime，把RemainTime = 0的Task移出EDF Linked list
         TaskFinishFlag = 0;
         if (EDF_TASK_HEAD != NULL) {
@@ -1079,7 +1080,9 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;
             OS_EXIT_CRITICAL();
         }
+        /*M11102136 [PA2][PART-I]*/
 
+        /*M11102136 [PA2][PART-I]*/
         /*每個Tick都在檢查有哪個task已經變成ready，要把他們對應的Ready Table位置設置成1
         每個Tick都會掃過所有TCB*/
         ptcb = OSTCBList;                                  /* Point at first TCB in TCB list               */ //OSTCBList
@@ -1110,7 +1113,9 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
+        /*M11102136 [PA2][PART-I]*/
 
+        /*M11102136 [PA2][PART-I]*/
         //把剛剛記錄到準備要Enqueue的Task，在這裡全部都Enqueue。
         if (EDF_TASK_WaitForEnqueueHEAD != NULL) {
             EDF_TASK_INFO* Iter;
@@ -1126,7 +1131,7 @@ void  OSTimeTick (void)
                 free(deleteTarget);
             }
         }
-
+        /*M11102136 [PA2][PART-I]*/
 #ifdef EDF_ShowList_DEBUG
         //印出當前EDF中，所有Task的狀態
         printf("\tEDF linked list = {\n");
@@ -2220,11 +2225,13 @@ INT8U  OS_TCBInit (INT8U    prio,
         ptcb->OSTCBStat          = OS_STAT_RDY;            /* Task is ready to run                     */
         ptcb->OSTCBStatPend      = OS_STAT_PEND_OK;        /* Clear pend status                        */
         ptcb->OSTCBDly           = 0u;                     /* Task is not delayed                      */
+        /*M11102136 [PA2][PART-I]*/
         if (ArriveTime > 0) {
             ptcb->OSTCBStat      = OS_STAT_SUSPEND;
             ptcb->OSTCBDly       = ArriveTime;
             printf("task %2d is suspended\n", id);
         }
+        /*M11102136 [PA2][PART-I]*/
 #if OS_TASK_CREATE_EXT_EN > 0u
         ptcb->OSTCBExtPtr        = pext;                   /* Store pointer to TCB extension           */
         ptcb->OSTCBStkSize       = stk_size;               /* Store stack size                         */

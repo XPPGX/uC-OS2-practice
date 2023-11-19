@@ -75,7 +75,9 @@ void  OSTimeDly (INT32U ticks)
         if (OSRdyTbl[y] == 0u) {
             OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
         }
+        /*M11102136 [PA2][PART-I]*/
         //OSTCBCur->OSTCBDly = ticks;              /* Load ticks in TCB                                  */
+        /*M11102136 [PA2][PART-I]*/
         OS_TRACE_TASK_DLY(ticks);
         OS_EXIT_CRITICAL();
         OS_Sched();                              /* Find next task to run!                             */

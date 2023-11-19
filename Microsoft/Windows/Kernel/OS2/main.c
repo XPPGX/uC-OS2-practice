@@ -106,9 +106,11 @@ int  main (void)
     /*Dynamic Create the Stack size*/
     Task_STK = malloc(TASK_NUMBER * sizeof(int*));
 
+    /*M11102136 [PA2][PART-I]*/
     Timing_INFO = (RECORD_INFO*)malloc(sizeof(RECORD_INFO) * (TASK_NUMBER + 1));
     memset(Timing_INFO, 0, sizeof(RECORD_INFO) * (TASK_NUMBER + 1));
-    /*for each pointer, allocate storage for an array of ints*/
+    /*M11102136 [PA2][PART-I]*/
+
     int n;
     for (n = 0; n < TASK_NUMBER; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
@@ -151,6 +153,7 @@ int  main (void)
 *********************************************************************************************************
 */
 
+/*M11102136 [PA2][PART-I]*/
 void task(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;
@@ -159,6 +162,7 @@ void task(void* p_arg) {
         OSTimeDly(task_data->TaskPeriodic);
     }
 }
+/*M11102136 [PA2][PART-I]*/
 
 void task1(void* p_arg) {
     task_para_set* task_data;
