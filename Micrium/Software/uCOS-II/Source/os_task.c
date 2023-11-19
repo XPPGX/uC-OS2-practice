@@ -404,6 +404,7 @@ INT8U  OSTaskCreateExt (void   (*task)(void *p_arg),
         else {
             task_para_set* TempPargPtr = (task_para_set*)p_arg;
             ArriveTime = TempPargPtr->TaskArriveTime;
+
         }
         /*M11102136 [PA2][PART-I]*/
         psp = OSTaskStkInit(task, p_arg, ptos, opt);           /* Initialize the task's stack          */

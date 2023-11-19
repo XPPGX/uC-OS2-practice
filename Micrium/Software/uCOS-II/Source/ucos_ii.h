@@ -1512,19 +1512,32 @@ void OutFileInit(void);
 void InputFile(void);
 
 /*M11102136[PA2-I]*/
-#define EDF_enqueue_DEBUG
-#define EDF_dequeue_DEBUG
-#define EDF_ShowList_DEBUG
+//#define PrintTimeTick
+//#define PrintSchedCalled
+//#define EDF_enqueue_DEBUG
+//#define EDF_dequeue_DEBUG
+//#define EDF_ShowList_DEBUG
 typedef struct edf_task_info {
     OS_TCB* ptcb;
     struct edf_task_info* Next;
 }EDF_TASK_INFO;
+
+typedef struct record_info {
+    int ArriveTime; //Task Arrive at OSTime
+    int FinishTime; //Task Finish at OSTime
+    int ResponseTime; // FinishTime - ArriveTime
+    int PreemptionTime; // ResponseTime - ExecutionTime;
+    int OSTimeDly; //Task.Deadline
+    int FinishJobs; //每sched一次就+1
+}RECORD_INFO;
 
 OS_EXT int ArriveTime;
 OS_EXT EDF_TASK_INFO* EDF_TASK_HEAD;
 OS_EXT EDF_TASK_INFO* EDF_TASK_WaitForEnqueueHEAD;
 OS_EXT EDF_TASK_INFO* EDF_TASK_WaitForEnqueueTAIL;
 OS_EXT int TaskFinishFlag;
+
+OS_EXT RECORD_INFO* Timing_INFO;
 
 void EDF_getEnqueueTasks(OS_TCB* _ptcb);
 void EDF_enqueue(OS_TCB* _ptcb);

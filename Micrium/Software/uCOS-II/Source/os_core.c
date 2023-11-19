@@ -715,7 +715,35 @@ void  OSIntExit (void)
                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
                 if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
 #if OS_TASK_PROFILE_EN > 0u
+
                     
+
+                    printf("%2d\tPreemption\t", OSTime);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d\tPreemption\t", OSTime);
+                        fclose(Output_fp);
+                    }
+
+                    if (OSTCBCur->OSTCBPrio == OS_TASK_IDLE_PRIO) {
+                        printf("task(%2d)  \t", OS_TASK_IDLE_PRIO);
+                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                            fprintf(Output_fp, "task(%2d)  \t", OS_TASK_IDLE_PRIO);
+                            fclose(Output_fp);
+                        }
+                    }
+                    else {
+                        printf("task(%2d)(%2d)\t", OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
+                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                            fprintf(Output_fp, "task(%2d)(%2d)\t", OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
+                            fclose(Output_fp);
+                        }
+                    }
+                    printf("task(%2d)(%2d)\n", OSTCBHighRdy->OSTCBId, Timing_INFO[OSTCBHighRdy->OSTCBId].FinishJobs);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "task(%2d)(%2d)\n", OSTCBHighRdy->OSTCBId, Timing_INFO[OSTCBHighRdy->OSTCBId].FinishJobs);
+                        fclose(Output_fp);
+                    }
+
                     OSTCBCur->OSTCBCtxSwCtr++;
                     
 #endif
@@ -887,8 +915,7 @@ void  OSStart (void)
             fprintf(Output_fp, "%d\t\t***********\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSCtxSwCtr);
             fclose(Output_fp);
         }*/
-        /*M11102136*/
-        printf("\n\n");
+
         OSStartHighRdy();                            /* Execute target specific code to start task     */
     }
 }
@@ -968,11 +995,12 @@ void  OSTimeTick (void)
 #if OS_TIME_GET_SET_EN > 0u
     OS_ENTER_CRITICAL();                                   /* Update the 32-bit tick counter               */
     OSTime++;
-    if (OSTime == 41) {
-        printf("Finish\n");
-    }
+
+#ifdef PrintTimeTick
     printf("===============================\n");
     printf("OSTime = %2d | NowTask = %2d\n", OSTime, OSTCBCur->OSTCBId);
+#endif
+
     OS_TRACE_TICK_INCREMENT(OSTime);
     OS_EXIT_CRITICAL();
 #endif
@@ -1016,12 +1044,15 @@ void  OSTimeTick (void)
                 if (EDF_TASK_HEAD->ptcb->RemainTime == 0) {
                     EDF_dequeue();
                     TaskFinishFlag = 2;
+                    
+                    //紀錄Timing_INFO的FinishTime
+                    Timing_INFO[OSTCBCur->OSTCBId].FinishTime = OSTime;
+                    Timing_INFO[OSTCBCur->OSTCBId].ResponseTime = Timing_INFO[OSTCBCur->OSTCBId].FinishTime - Timing_INFO[OSTCBCur->OSTCBId].ArriveTime;
+                    Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime = Timing_INFO[OSTCBCur->OSTCBId].ResponseTime - TaskParameter[OSTCBCur->OSTCBId - 1].TaskExecutionTime;
+                    Timing_INFO[OSTCBCur->OSTCBId].OSTimeDly = OSTCBCur->DeadLine - 1;
                 }
             }
             OS_EXIT_CRITICAL();
-        }
-        if (OSTime == 11) {
-            printf("HI\n");
         }
         //倒數Deadline，把準備要enqueue的Task都先記錄起來
         EDF_TASK_WaitForEnqueueHEAD = NULL;
@@ -1033,8 +1064,12 @@ void  OSTimeTick (void)
                 ptcb->DeadLine--;
                 if (ptcb->DeadLine == 0) {
                     if (ptcb->RemainTime > 0) {
-                        printf("MissDeadline\n");
-                        system("pause");
+                        printf("%2d\tMissDeadline\ttask(%2d)(%2d)\t------------\n", OSTime, OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
+                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                            fprintf(Output_fp, "%2d\tMissDeadline\ttask(%2d)(%2d)\t------------\n", OSTime, OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
+                            fclose(Output_fp);
+                        }
+                        exit(1);
                     }
                     else {
                         EDF_getEnqueueTasks(ptcb);
@@ -1044,18 +1079,6 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;
             OS_EXIT_CRITICAL();
         }
-        //把剛剛記錄到準備要Enqueue的Task，在這裡全部都Enqueue。
-        if (EDF_TASK_WaitForEnqueueHEAD != NULL) {
-            EDF_TASK_INFO* Iter;
-            EDF_TASK_INFO* deleteTarget;
-            for (Iter = EDF_TASK_WaitForEnqueueHEAD; Iter != NULL; ) {
-                EDF_enqueue(Iter->ptcb);
-                deleteTarget = Iter;
-                Iter = Iter->Next;
-                free(deleteTarget);
-            }
-        }
-
 
         /*每個Tick都在檢查有哪個task已經變成ready，要把他們對應的Ready Table位置設置成1
         每個Tick都會掃過所有TCB*/
@@ -1080,13 +1103,30 @@ void  OSTimeTick (void)
                         OSRdyGrp               |= ptcb->OSTCBBitY;             /* No,  Make ready          */
                         OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
                         OS_TRACE_TASK_READY(ptcb);
-                        EDF_enqueue(ptcb);
+                        EDF_getEnqueueTasks(ptcb);
                     }
                 }
             }
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
+
+        //把剛剛記錄到準備要Enqueue的Task，在這裡全部都Enqueue。
+        if (EDF_TASK_WaitForEnqueueHEAD != NULL) {
+            EDF_TASK_INFO* Iter;
+            EDF_TASK_INFO* deleteTarget;
+            for (Iter = EDF_TASK_WaitForEnqueueHEAD; Iter != NULL; ) {
+                //紀錄Timing_INFO
+                Timing_INFO[Iter->ptcb->OSTCBId].ArriveTime = OSTime;
+
+                //Enqueue
+                EDF_enqueue(Iter->ptcb);
+                deleteTarget = Iter;
+                Iter = Iter->Next;
+                free(deleteTarget);
+            }
+        }
+
 #ifdef EDF_ShowList_DEBUG
         //印出當前EDF中，所有Task的狀態
         printf("\tEDF linked list = {\n");
@@ -1097,8 +1137,9 @@ void  OSTimeTick (void)
             }
         }
         printf("\t}\n");
-    }
 #endif
+    }
+
 
 }
 
@@ -1804,9 +1845,42 @@ void  OS_Sched (void)
     OS_ENTER_CRITICAL();
     if (OSIntNesting == 0u) {                          /* Schedule only if all ISRs done and ...       */
         if (OSLockNesting == 0u) {                     /* ... scheduler is not locked                  */
-            OS_SchedNew(); //取得當前在ready list中的最高優先權，也就是修改OSTCBHighRdy
+
+#ifdef PrintSchedCalled
             printf("\tTask[%2d] => call Sched()\n", OSTCBCur->OSTCBId);
+#endif
+            
+            OS_SchedNew(); //取得當前在ready list中的最高優先權，也就是修改OSTCBHighRdy
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
+
+            printf("%2d\tCompletion\ttask(%2d)(%2d)\t", OSTime, OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
+            if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                fprintf(Output_fp, "%2d\tCompletion\ttask(%2d)(%2d)\t", OSTime, OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
+                fclose(Output_fp);
+            }
+
+            Timing_INFO[OSTCBCur->OSTCBId].FinishJobs++;
+            if (OSPrioHighRdy == OS_TASK_IDLE_PRIO) {
+                printf("task(%2d)  \t", OS_TASK_IDLE_PRIO);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "task(%2d)  \t", OS_TASK_IDLE_PRIO);
+                    fclose(Output_fp);
+                }
+            }
+            else {
+                printf("task(%2d)(%2d)\t", OSTCBHighRdy->OSTCBId, Timing_INFO[OSTCBHighRdy->OSTCBId].FinishJobs);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "task(%2d)(%2d)\t", OSTCBHighRdy->OSTCBId, Timing_INFO[OSTCBHighRdy->OSTCBId].FinishJobs);
+                    fclose(Output_fp);
+                }
+            }
+            printf("%2d\t%2d\t%2d\n", Timing_INFO[OSTCBCur->OSTCBId].ResponseTime, Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime, Timing_INFO[OSTCBCur->OSTCBId].OSTimeDly);
+            if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                fprintf(Output_fp, "%2d\t%2d\t%2d\n", Timing_INFO[OSTCBCur->OSTCBId].ResponseTime, Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime, Timing_INFO[OSTCBCur->OSTCBId].OSTimeDly);
+                fclose(Output_fp);
+            }
+            
+
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
                 
 #if OS_TASK_PROFILE_EN > 0u
@@ -2249,8 +2323,11 @@ INT8U  OS_TCBInit (INT8U    prio,
             OSRdyGrp |= ptcb->OSTCBBitY;
             OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
             OS_TRACE_TASK_READY(ptcb);
-            printf("Task %2d is created and ready, \t", id);
+            printf("Task %2d is created and ready\n", id);
             EDF_enqueue(ptcb);
+
+            //紀錄Timing
+            Timing_INFO[id].ArriveTime = OSTime;
         }
         /*M11102136 [PA2][PART-I]*/
         

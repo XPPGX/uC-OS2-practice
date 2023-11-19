@@ -105,11 +105,13 @@ int  main (void)
 
     /*Dynamic Create the Stack size*/
     Task_STK = malloc(TASK_NUMBER * sizeof(int*));
+
+    Timing_INFO = (RECORD_INFO*)malloc(sizeof(RECORD_INFO) * (TASK_NUMBER + 1));
+    memset(Timing_INFO, 0, sizeof(RECORD_INFO) * (TASK_NUMBER + 1));
     /*for each pointer, allocate storage for an array of ints*/
     int n;
     for (n = 0; n < TASK_NUMBER; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
-
     }
     for (int i = 0; i < TASK_NUMBER; i++) {
         OSTaskCreateExt(task,
