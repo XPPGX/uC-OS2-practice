@@ -1,21 +1,21 @@
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uC-CPU\cpu_core.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\cpu_core.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uC-CPU\Win32\Visual_Studio\cpu_c.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\cpu_c.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uC-LIB\lib_ascii.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\lib_ascii.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uC-LIB\lib_math.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\lib_math.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uC-LIB\lib_mem.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\lib_mem.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uC-LIB\lib_str.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\lib_str.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Ports\Win32\Visual Studio\os_cpu_c.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_cpu_c.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_core.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_dbg_r.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_dbg_r.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_flag.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_flag.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_mbox.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_mbox.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_mem.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_mem.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_mutex.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_mutex.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_q.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_q.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_sem.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_sem.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_task.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_task.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_time.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_time.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_tmr.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_tmr.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\BSP\Windows\bsp_cpu.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\bsp_cpu.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\app_hooks.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\app_hooks.obj
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c;D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\main.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uC-CPU\cpu_core.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\cpu_core.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uC-CPU\Win32\Visual_Studio\cpu_c.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\cpu_c.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uC-LIB\lib_ascii.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\lib_ascii.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uC-LIB\lib_math.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\lib_math.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uC-LIB\lib_mem.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\lib_mem.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uC-LIB\lib_str.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\lib_str.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Ports\Win32\Visual Studio\os_cpu_c.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_cpu_c.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_core.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_dbg_r.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_dbg_r.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_flag.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_flag.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_mbox.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_mbox.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_mem.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_mem.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_mutex.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_mutex.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_q.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_q.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_sem.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_sem.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_task.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_task.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_time.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_time.obj
+C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_tmr.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\os_tmr.obj
+C:\NTUST\uC-OS2-practice\Microsoft\BSP\Windows\bsp_cpu.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\bsp_cpu.obj
+C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\app_hooks.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\app_hooks.obj
+C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c;C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\main.obj
