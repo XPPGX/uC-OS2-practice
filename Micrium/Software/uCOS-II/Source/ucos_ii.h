@@ -1510,17 +1510,32 @@ void          OSCtxSw                 (void);
 
 void OutFileInit(void);
 void InputFile(void);
-
 /*M11102136[PA2][PART-I]*/
-//#define PrintTimeTick
-//#define PrintSchedCalled
-//#define EDF_enqueue_DEBUG
-//#define EDF_dequeue_DEBUG
-//#define EDF_ShowList_DEBUG
+#define PrintTimeTick
+#define PrintSchedCalled
+#define EDF_enqueue_DEBUG
+#define EDF_dequeue_DEBUG
+#define EDF_ShowList_DEBUG
+
+#define InputFile_AperiodicTask_DEBUG
+#define Aperiodic_ShowList_DEBUG
 typedef struct edf_task_info {
     OS_TCB* ptcb;
     struct edf_task_info* Next;
 }EDF_TASK_INFO;
+
+typedef struct cus {
+    int TaskID;             //CUS Server ID
+    int ServerSizeInversed; //ServerSizeInversed = 100 / ServerSize，可直接乘es
+}CUS;
+
+typedef struct aperiodic_task {
+    int JobID;
+    int ArriveTime;
+    int ExecutionTime;
+    int AbsolutelyDeadline;
+    struct aperiodic_task* Next;
+}Aperiodic_Task_Info;
 
 typedef struct record_info {
     int ArriveTime; //Task Arrive at OSTime
@@ -1531,17 +1546,26 @@ typedef struct record_info {
     int FinishJobs; //每sched一次就+1
 }RECORD_INFO;
 
+
+
 OS_EXT int ArriveTime;
 OS_EXT EDF_TASK_INFO* EDF_TASK_HEAD;
 OS_EXT EDF_TASK_INFO* EDF_TASK_WaitForEnqueueHEAD;
 OS_EXT EDF_TASK_INFO* EDF_TASK_WaitForEnqueueTAIL;
 OS_EXT int TaskFinishFlag;
 
+OS_EXT CUS* CUS_INFO;
+OS_EXT Aperiodic_Task_Info* Aperiodic_TASK_HEAD;
+
 OS_EXT RECORD_INFO* Timing_INFO;
 
 void EDF_getEnqueueTasks(OS_TCB* _ptcb);
 void EDF_enqueue(OS_TCB* _ptcb);
 void EDF_dequeue();
+
+void InputFile_AperiodicTask(void);
+void AperiodicTaskDequeue(void);
+
 /*M11102136[PA2][PART-I]*/
 /*
 *********************************************************************************************************

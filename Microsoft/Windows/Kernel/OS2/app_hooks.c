@@ -103,6 +103,7 @@ void InputFile() {
     * Task Information
     * Task_ID ArriveTime Execution Periodic
     */
+
     errno_t err;
     if ((err = fopen_s(&fp, INPUT_FILE_NAME, "r")) == 0) {
         printf("The file 'Taskset.txt' was opened\n");
@@ -114,11 +115,17 @@ void InputFile() {
     char* ptr;
     char* pTmp = NULL;
     int TaskInfo[INFO], i, j = 0;
+    
     TASK_NUMBER = 0;
     
     while (!feof(fp)) {
         i = 0;
         memset(str, 0, sizeof(str));
+
+        for (int k = 0; k < INFO; k++) {
+            TaskInfo[k] = -1;
+        }
+
         fgets(str, sizeof(str) - 1, fp);
         ptr = strtok_s(str, " ", &pTmp);
         while (ptr != NULL) {
@@ -145,9 +152,146 @@ void InputFile() {
         /*M11102136*/
         j++;
     }
+
     fclose(fp);
     /*read file*/
+
+    TASK_NUMBER--;  //真正的Periodic Task數量
+    j--;            //取得TaskParameter中關於CUS的Index
+    printf("Total Periodic Task Number = %2d\n", TASK_NUMBER);
+
+    //初始化CUS_INFO
+    CUS_INFO = (CUS*)malloc(sizeof(CUS));
+    memset(CUS_INFO, 0, sizeof(CUS));
+    CUS_INFO->TaskID = TaskParameter[j].TaskID;
+    CUS_INFO->ServerSizeInversed = 100 / (TaskParameter[j].TaskArriveTime); //取得倒數的ServerSize，後續可直接乘Aperiodic Job的Execution Time
+    printf("CUS = {ID = %2d, ServerSizeInversed = %2d}\n", CUS_INFO->TaskID, CUS_INFO->ServerSizeInversed);
 }
+
+void InputFile_AperiodicTask() {
+    errno_t err;
+    if ((err = fopen_s(&fp, APERIODIC_FILE_NAME, "r")) == 0) {
+        printf("The file 'Aperiodicjobs.txt' was opened\n");
+    }
+    else {
+        printf("The file 'Aperiodicjobs.txt' was not opened\n");
+    }
+    
+    char str[MAX];
+    char* token;
+    char* remainPart = NULL;
+    
+    int JobID           = -1;
+    int ArriveTime      = -1;
+    int ExecutionTime   = -1;
+    int AbsDeadline     = -1;
+
+    Aperiodic_TASK_HEAD = NULL;
+    while (!feof(fp)) {
+        memset(str, 0, sizeof(str));
+        fgets(str, sizeof(str) - 1, fp);
+     
+        token = strtok_s(str , " ", &remainPart);       JobID           = atoi(token);
+        token = strtok_s(NULL, " ", &remainPart);       ArriveTime      = atoi(token);
+        token = strtok_s(NULL, " ", &remainPart);       ExecutionTime   = atoi(token);
+        token = strtok_s(NULL, " ", &remainPart);       AbsDeadline     = atoi(token);
+        
+
+        //以ArriveTime去比較，決定Job先後順序，ArriveTime小的在前
+        if (Aperiodic_TASK_HEAD == NULL) {
+            Aperiodic_TASK_HEAD = (Aperiodic_Task_Info*)malloc(sizeof(Aperiodic_Task_Info));
+            Aperiodic_TASK_HEAD->JobID              = JobID;
+            Aperiodic_TASK_HEAD->ArriveTime         = ArriveTime;
+            Aperiodic_TASK_HEAD->ExecutionTime      = ExecutionTime;
+            Aperiodic_TASK_HEAD->AbsolutelyDeadline = AbsDeadline;
+            Aperiodic_TASK_HEAD->Next               = NULL;
+#ifdef InputFile_AperiodicTask_DEBUG
+            printf("AperiodicTask.ID = %2d, is enqueued done [0]\n", Aperiodic_TASK_HEAD->JobID);
+#endif
+        }
+        else {
+            Aperiodic_Task_Info* New_AperiodicTask  = (Aperiodic_Task_Info*)malloc(sizeof(Aperiodic_Task_Info));
+            New_AperiodicTask->JobID                = JobID;
+            New_AperiodicTask->ArriveTime           = ArriveTime;
+            New_AperiodicTask->ExecutionTime        = ExecutionTime;
+            New_AperiodicTask->AbsolutelyDeadline   = AbsDeadline;
+            New_AperiodicTask->Next                 = NULL;
+
+            if (Aperiodic_TASK_HEAD->ArriveTime > New_AperiodicTask->ArriveTime) {          /*當Head->ArriveTime > New->ArriveTime*/
+                New_AperiodicTask->Next = Aperiodic_TASK_HEAD;
+                Aperiodic_TASK_HEAD = New_AperiodicTask;
+#ifdef InputFile_AperiodicTask_DEBUG
+                printf("AperiodicTask.ID = %2d, is enqueued done [1]\n", New_AperiodicTask->JobID);
+#endif
+            }
+            else if (Aperiodic_TASK_HEAD->ArriveTime == New_AperiodicTask->ArriveTime) {    /*當Head->ArriveTime == New->ArriveTime*/
+                if (Aperiodic_TASK_HEAD->JobID < New_AperiodicTask->JobID) {    //當Head->ID < New->ID
+                    Aperiodic_Task_Info* IterPrev = Aperiodic_TASK_HEAD;
+                    Aperiodic_Task_Info* Iter = Aperiodic_TASK_HEAD->Next;
+                    //讓Iter走到New_Aperiodic該放入的地方
+                    for (; (Iter->ArriveTime == New_AperiodicTask->ArriveTime) && (Iter->JobID < New_AperiodicTask->JobID) && (Iter != NULL); Iter = Iter->Next, IterPrev = IterPrev->Next);
+                    New_AperiodicTask->Next = Iter;
+                    IterPrev->Next = New_AperiodicTask;
+#ifdef InputFile_AperiodicTask_DEBUG
+                    printf("AperiodicTask.ID = %2d, is enqueued done [2]\n", New_AperiodicTask->JobID);
+#endif
+                }
+                else {                                                          //當Head->ID > New->ID
+                    New_AperiodicTask->Next = Aperiodic_TASK_HEAD;
+                    Aperiodic_TASK_HEAD = New_AperiodicTask;
+#ifdef InputFile_AperiodicTask_DEBUG
+                    printf("AperiodicTask.ID = %2d, is enqueued done [3]\n", New_AperiodicTask->JobID);
+#endif
+                }
+            }
+            else {                                                                          /*當Head->ArriveTime < New->ArriveTime*/
+                Aperiodic_Task_Info* IterPrev   = Aperiodic_TASK_HEAD;
+                Aperiodic_Task_Info* Iter       = Aperiodic_TASK_HEAD->Next;
+                for (; Iter != NULL; Iter = Iter->Next) {                                   
+                    if (Iter->ArriveTime > New_AperiodicTask->ArriveTime) {     /*當Iter->ArriveTime > New->ArriveTime*/
+                        New_AperiodicTask->Next = Iter;
+                        IterPrev->Next          = New_AperiodicTask;
+#ifdef InputFile_AperiodicTask_DEBUG
+                        printf("AperiodicTask.ID = %2d, is enqueued done [4]\n", New_AperiodicTask->JobID);
+#endif
+                        break;
+                    }
+                    else if (Iter->ArriveTime == New_AperiodicTask) {           /*當Iter->ArriveTime == New->ArriveTime*/
+                        if (Iter->JobID < New_AperiodicTask->JobID) {   //當Iter->ID < New->ID
+                            New_AperiodicTask->Next = Iter->Next;
+                            Iter->Next              = New_AperiodicTask;
+#ifdef InputFile_AperiodicTask_DEBUG
+                            printf("AperiodicTask.ID = %2d, is enqueued done [5]\n", New_AperiodicTask->JobID);
+#endif
+                            break;
+                        }
+                        else {                                          //當Iter->ID > New->ID
+                            IterPrev->Next          = New_AperiodicTask;
+                            New_AperiodicTask->Next = Iter;
+#ifdef InputFile_AperiodicTask_DEBUG
+                            printf("AperiodicTask.ID = %2d, is enqueued done [6]\n", New_AperiodicTask->JobID);
+#endif
+                            break;
+                        }
+                    }
+                }
+                //如果Iter走到NULL，New_AperiodicTask都沒有合適的位置可以放入，代表New_AperiodicTask要放在最後面
+                if (Iter == NULL) {
+                    IterPrev->Next = New_AperiodicTask;
+#ifdef InputFile_AperiodicTask_DEBUG
+                    printf("AperiodicTask.ID = %2d, is enqueued done [7]\n", New_AperiodicTask->JobID);
+#endif
+                }
+            }
+        }
+#ifdef Aperiodic_ShowList_DEBUG
+        for (Aperiodic_Task_Info* Iter = Aperiodic_TASK_HEAD; Iter != NULL; Iter = Iter->Next) {
+            printf("Job[%2d] = {ArriveTime = %2d, ExecutionTime = %2d, AbsDeadline = %2d\n", Iter->JobID, Iter->ArriveTime, Iter->ExecutionTime, Iter->AbsolutelyDeadline);
+        }
+#endif
+    }
+}
+
 /*
 *********************************************************************************************************
 *********************************************************************************************************

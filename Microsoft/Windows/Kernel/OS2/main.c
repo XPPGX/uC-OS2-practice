@@ -66,6 +66,7 @@ static  OS_STK  StartupTaskStk[APP_CFG_STARTUP_TASK_STK_SIZE];
 static void task(void* p_arg);
 static void task1(void* p_arg);
 static void task2(void* p_arg);
+static void CUS_SERVER(void* p_arg);
 static  void  StartupTask (void  *p_arg);
 
 
@@ -102,7 +103,7 @@ int  main (void)
     OutFileInit();
     /*Input File*/
     InputFile();
-
+    InputFile_AperiodicTask();
     /*Dynamic Create the Stack size*/
     Task_STK = malloc(TASK_NUMBER * sizeof(int*));
 
@@ -126,6 +127,16 @@ int  main (void)
             &TaskParameter[i],
             (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
     }
+    //創建CUS_Server
+    //OSTaskCreateExt(CUS_SERVER,
+    //                NULL,
+    //                &Task_STK[n][TASK_STACKSIZE - 1],
+    //                TaskParameter[n].TaskPriority,
+    //                CUS_INFO->TaskID,
+    //                &Task_STK[n][0],
+    //                TASK_STACKSIZE,
+    //                NULL,
+    //                (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
 
@@ -153,16 +164,23 @@ int  main (void)
 *********************************************************************************************************
 */
 
-/*M11102136 [PA2][PART-I]*/
+/*M11102136 [PA2][PART-II]*/
 void task(void* p_arg) {
     task_para_set* task_data;
     task_data = p_arg;
     while (1) {
         while (OSTCBCur->RemainTime > 0 && TaskFinishFlag == 0);
-        OSTimeDly(task_data->TaskPeriodic);
+        OSTimeDly(task_data->TaskPeriodic); //此處的task_data->TaskPeriodic只是為了使用Sched，實際上是Deadline在控制
     }
 }
-/*M11102136 [PA2][PART-I]*/
+
+void CUS_SERVER(void* p_arg) {
+    while (1) {
+        while (OSTCBCur->RemainTime > 0);
+        OSTimeDly(1); //此處的1是為了要使用Sched
+    }
+}
+/*M11102136 [PA2][PART-II]*/
 
 void task1(void* p_arg) {
     task_para_set* task_data;

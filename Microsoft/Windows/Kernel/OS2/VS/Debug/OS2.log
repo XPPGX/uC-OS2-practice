@@ -1,34 +1,7 @@
-﻿  cpu_core.c
-  cpu_c.c
-  lib_ascii.c
-  lib_math.c
-  lib_mem.c
-  lib_str.c
-  os_cpu_c.c
-  os_core.c
-  os_dbg_r.c
-C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(1011,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
-C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(1131,17): warning C4013: 'free' 未定義; 假設 extern 傳回整數
-C:\NTUST\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(2352,63): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
-  os_flag.c
-  os_mbox.c
-  os_mem.c
-  os_mutex.c
-  os_q.c
-  os_sem.c
-  os_task.c
-  os_time.c
-  os_tmr.c
-  bsp_cpu.c
-  app_hooks.c
-C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\app_hooks.c(125,27): warning C4013: 'atoi' 未定義; 假設 extern 傳回整數
-  正在產生程式碼...
-  正在編譯...
-  main.c
-C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(107,16): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
-C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(107,14): warning C4047: '=': 'OS_STK **' 與 'int' 間接取值的層級不同
-C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(116,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
-C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(122,29): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
-C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(90,17): warning C4101: 'os_err': 未參考的區域變數
-  正在產生程式碼...
+﻿  main.c
+C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(108,16): warning C4013: 'malloc' 未定義; 假設 extern 傳回整數
+C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(108,14): warning C4047: '=': 'OS_STK **' 與 'int' 間接取值的層級不同
+C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(117,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
+C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(123,29): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
+C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(91,17): warning C4101: 'os_err': 未參考的區域變數
   OS2.vcxproj -> C:\NTUST\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

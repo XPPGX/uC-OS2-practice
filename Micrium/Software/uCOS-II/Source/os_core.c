@@ -995,7 +995,9 @@ void  OSTimeTick (void)
 #if OS_TIME_GET_SET_EN > 0u
     OS_ENTER_CRITICAL();                                   /* Update the 32-bit tick counter               */
     OSTime++;
-
+    if (OSTime == 41) {
+        printf("Hi\n");
+    }
 #ifdef PrintTimeTick
     printf("===============================\n");
     printf("OSTime = %2d | NowTask = %2d\n", OSTime, OSTCBCur->OSTCBId);
