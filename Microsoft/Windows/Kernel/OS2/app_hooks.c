@@ -156,6 +156,7 @@ void InputFile() {
     fclose(fp);
     /*read file*/
 
+    /*M11102136 [PA2][PART-II]*/
     j--;            //取得TaskParameter中關於CUS的Index
     printf("Total Periodic Task Number = %2d\n", TASK_NUMBER); //取得Periodic Task的數量 + CUS(1個)的數量。
 
@@ -165,8 +166,10 @@ void InputFile() {
     CUS_INFO->TaskID = TaskParameter[j].TaskID;
     CUS_INFO->ServerSizeInversed = 100 / (TaskParameter[j].TaskArriveTime); //取得倒數的ServerSize，後續可直接乘Aperiodic Job的Execution Time
     printf("CUS = {ID = %2d, ServerSizeInversed = %2d}\n", CUS_INFO->TaskID, CUS_INFO->ServerSizeInversed);
+    /*M11102136 [PA2][PART-II]*/
 }
 
+/*M11102136 [PA2][PART-II]*/
 void InputFile_AperiodicTask() {
     errno_t err;
     if ((err = fopen_s(&fp, APERIODIC_FILE_NAME, "r")) == 0) {
@@ -292,6 +295,7 @@ void InputFile_AperiodicTask() {
     }
 #endif
 }
+/*M11102136 [PA2][PART-II]*/
 
 /*
 *********************************************************************************************************

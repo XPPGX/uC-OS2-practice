@@ -1544,15 +1544,13 @@ typedef struct aperiodic_task {
 }Aperiodic_Task_Info;
 
 typedef struct record_info {
-    int ArriveTime; //Task Arrive at OSTime
-    int FinishTime; //Task Finish at OSTime
-    int ResponseTime; // FinishTime - ArriveTime
+    int ArriveTime;     //Task Arrive at OSTime
+    int FinishTime;     //Task Finish at OSTime
+    int ResponseTime;   // FinishTime - ArriveTime
     int PreemptionTime; // ResponseTime - ExecutionTime;
-    int OSTimeDly; //Task.Deadline
-    int FinishJobs; //每sched一次就+1
+    int OSTimeDly;      //Task.Deadline
+    int FinishJobs;     //每sched一次就+1
 }RECORD_INFO;
-
-
 
 OS_EXT int ArriveTime;
 OS_EXT EDF_TASK_INFO* EDF_TASK_HEAD;
@@ -1560,8 +1558,10 @@ OS_EXT EDF_TASK_INFO* EDF_TASK_WaitForEnqueueHEAD;
 OS_EXT EDF_TASK_INFO* EDF_TASK_WaitForEnqueueTAIL;
 OS_EXT int TaskFinishFlag;
 
-OS_EXT CUS* CUS_INFO;
-OS_EXT Aperiodic_Task_Info* Aperiodic_TASK_HEAD;
+OS_EXT CUS* CUS_INFO;                               //一個global的指標，紀錄CUS的資訊
+OS_EXT Aperiodic_Task_Info* Aperiodic_TASK_HEAD;    //一個global的指標，紀錄Aperiodic_TASK_HEAD
+//只要HEAD不為NULL，就代表還有Aperiodic Job待執行
+//如果HEAD的ArriveTime = 0，代表該Job要被放到CUS上去執行
 
 OS_EXT RECORD_INFO* Timing_INFO;
 
@@ -1570,7 +1570,6 @@ void EDF_enqueue(OS_TCB* _ptcb);
 void EDF_dequeue();
 
 void InputFile_AperiodicTask(void);
-void AperiodicTaskDequeue(void);
 
 /*M11102136[PA2][PART-I]*/
 /*
