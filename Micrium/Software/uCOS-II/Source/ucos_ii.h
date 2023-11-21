@@ -1511,14 +1511,16 @@ void          OSCtxSw                 (void);
 void OutFileInit(void);
 void InputFile(void);
 /*M11102136[PA2][PART-I]*/
-#define PrintTimeTick
-#define PrintSchedCalled
-#define EDF_enqueue_DEBUG
-#define EDF_dequeue_DEBUG
-#define EDF_ShowList_DEBUG
+//#define PrintTimeTick
+//#define PrintSchedCalled
+//#define EDF_enqueue_DEBUG
+//#define EDF_dequeue_DEBUG
+//#define EDF_ShowList_DEBUG
+//
+//#define InputFile_AperiodicTask_DEBUG
+//#define Aperiodic_ShowList_DEBUG
 
-#define InputFile_AperiodicTask_DEBUG
-#define Aperiodic_ShowList_DEBUG
+#define CUS_SERVER_PRIO 60
 typedef struct edf_task_info {
     OS_TCB* ptcb;
     struct edf_task_info* Next;
@@ -1527,11 +1529,15 @@ typedef struct edf_task_info {
 typedef struct cus {
     int TaskID;             //CUS Server ID
     int ServerSizeInversed; //ServerSizeInversed = 100 / ServerSize，可直接乘es
+    int CurAbsDeadline;     //紀錄當前Aperiodic job的AbsDeadline
+    int CurOriArriveTime;   //紀錄當前Aperiodic job的ArriveTime
+    int JobCount;           //Job完成數
 }CUS;
 
 typedef struct aperiodic_task {
     int JobID;
     int ArriveTime;
+    int OriginalArriveTime;
     int ExecutionTime;
     int AbsolutelyDeadline;
     struct aperiodic_task* Next;

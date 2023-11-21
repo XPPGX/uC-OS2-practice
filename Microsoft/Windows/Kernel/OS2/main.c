@@ -116,7 +116,8 @@ int  main (void)
     for (n = 0; n < TASK_NUMBER; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
     }
-    for (int i = 0; i < TASK_NUMBER; i++) {
+
+    for (int i = 0; i < TASK_NUMBER - 1; i++) {
         OSTaskCreateExt(task,
             &TaskParameter[i],
             &Task_STK[i][TASK_STACKSIZE - 1],
@@ -128,16 +129,16 @@ int  main (void)
             (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
     }
     //創建CUS_Server
-    //OSTaskCreateExt(CUS_SERVER,
-    //                NULL,
-    //                &Task_STK[n][TASK_STACKSIZE - 1],
-    //                TaskParameter[n].TaskPriority,
-    //                CUS_INFO->TaskID,
-    //                &Task_STK[n][0],
-    //                TASK_STACKSIZE,
-    //                NULL,
-    //                (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-
+    OSTaskCreateExt(CUS_SERVER,
+                    (void*)0,
+                    &Task_STK[n - 1][TASK_STACKSIZE - 1], //n - 1才是CUS的STACK編號
+                    CUS_SERVER_PRIO, //設CUS_SERVER_PRIO = 60;
+                    CUS_INFO->TaskID,
+                    &Task_STK[n - 1][0],
+                    TASK_STACKSIZE,
+                    (void*)0,
+                    (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+    
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
 
    
@@ -177,7 +178,7 @@ void task(void* p_arg) {
 void CUS_SERVER(void* p_arg) {
     while (1) {
         while (OSTCBCur->RemainTime > 0);
-        OSTimeDly(1); //此處的1是為了要使用Sched
+        OSTimeDly(1); //此處1是為了要讓CUS使用Sched
     }
 }
 /*M11102136 [PA2][PART-II]*/

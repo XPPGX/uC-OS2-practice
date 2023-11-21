@@ -156,9 +156,8 @@ void InputFile() {
     fclose(fp);
     /*read file*/
 
-    TASK_NUMBER--;  //真正的Periodic Task數量
     j--;            //取得TaskParameter中關於CUS的Index
-    printf("Total Periodic Task Number = %2d\n", TASK_NUMBER);
+    printf("Total Periodic Task Number = %2d\n", TASK_NUMBER); //取得Periodic Task的數量 + CUS(1個)的數量。
 
     //初始化CUS_INFO
     CUS_INFO = (CUS*)malloc(sizeof(CUS));
@@ -204,6 +203,7 @@ void InputFile_AperiodicTask() {
             Aperiodic_TASK_HEAD->ArriveTime         = ArriveTime;
             Aperiodic_TASK_HEAD->ExecutionTime      = ExecutionTime;
             Aperiodic_TASK_HEAD->AbsolutelyDeadline = AbsDeadline;
+            Aperiodic_TASK_HEAD->OriginalArriveTime = ArriveTime;
             Aperiodic_TASK_HEAD->Next               = NULL;
 #ifdef InputFile_AperiodicTask_DEBUG
             printf("AperiodicTask.ID = %2d, is enqueued done [0]\n", Aperiodic_TASK_HEAD->JobID);
@@ -215,6 +215,7 @@ void InputFile_AperiodicTask() {
             New_AperiodicTask->ArriveTime           = ArriveTime;
             New_AperiodicTask->ExecutionTime        = ExecutionTime;
             New_AperiodicTask->AbsolutelyDeadline   = AbsDeadline;
+            New_AperiodicTask->OriginalArriveTime   = ArriveTime;
             New_AperiodicTask->Next                 = NULL;
 
             if (Aperiodic_TASK_HEAD->ArriveTime > New_AperiodicTask->ArriveTime) {          /*當Head->ArriveTime > New->ArriveTime*/
@@ -284,12 +285,12 @@ void InputFile_AperiodicTask() {
                 }
             }
         }
-#ifdef Aperiodic_ShowList_DEBUG
-        for (Aperiodic_Task_Info* Iter = Aperiodic_TASK_HEAD; Iter != NULL; Iter = Iter->Next) {
-            printf("Job[%2d] = {ArriveTime = %2d, ExecutionTime = %2d, AbsDeadline = %2d\n", Iter->JobID, Iter->ArriveTime, Iter->ExecutionTime, Iter->AbsolutelyDeadline);
-        }
-#endif
     }
+#ifdef Aperiodic_ShowList_DEBUG
+    for (Aperiodic_Task_Info* Iter = Aperiodic_TASK_HEAD; Iter != NULL; Iter = Iter->Next) {
+        printf("Job[%2d] = {ArriveTime = %2d, ExecutionTime = %2d, AbsDeadline = %2d\n", Iter->JobID, Iter->ArriveTime, Iter->ExecutionTime, Iter->AbsolutelyDeadline);
+    }
+#endif
 }
 
 /*

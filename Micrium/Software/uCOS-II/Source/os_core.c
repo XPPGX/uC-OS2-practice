@@ -909,12 +909,7 @@ void  OSStart (void)
         OSPrioCur     = OSPrioHighRdy;
         OSTCBHighRdy  = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
         OSTCBCur      = OSTCBHighRdy;
-
-        /*printf("%d\t\t***********\t\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSCtxSwCtr);
-        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-            fprintf(Output_fp, "%d\t\t***********\t\ttask(%2d)(%2d)\t\t%2d\n", OSTime, OSTCBCur->OSTCBId, OSTCBCur->OSTCBCtxSwCtr, OSCtxSwCtr);
-            fclose(Output_fp);
-        }*/
+        
 
         OSStartHighRdy();                            /* Execute target specific code to start task     */
     }
@@ -995,9 +990,6 @@ void  OSTimeTick (void)
 #if OS_TIME_GET_SET_EN > 0u
     OS_ENTER_CRITICAL();                                   /* Update the 32-bit tick counter               */
     OSTime++;
-    if (OSTime == 41) {
-        printf("Hi\n");
-    }
 #ifdef PrintTimeTick
     printf("===============================\n");
     printf("OSTime = %2d | NowTask = %2d\n", OSTime, OSTCBCur->OSTCBId);
@@ -1045,18 +1037,28 @@ void  OSTimeTick (void)
             if (EDF_TASK_HEAD->ptcb->RemainTime != 0) {
                 EDF_TASK_HEAD->ptcb->RemainTime--;
                 if (EDF_TASK_HEAD->ptcb->RemainTime == 0) {
+                    if (EDF_TASK_HEAD->ptcb->OSTCBPrio == CUS_SERVER_PRIO) {
+                        printf("%2d\tAperiodic job(%d) is finished.\n", OSTime, CUS_INFO->JobCount);
+                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                            fprintf(Output_fp, "%2d\tAperiodic job(%d) is finished.\n", OSTime, CUS_INFO->JobCount);
+                            fclose(Output_fp);
+                        }
+                        CUS_INFO->JobCount++;
+                    }
                     EDF_dequeue();
                     TaskFinishFlag = 2;
                     
                     //紀錄Timing_INFO的FinishTime
-                    Timing_INFO[OSTCBCur->OSTCBId].FinishTime = OSTime;
-                    Timing_INFO[OSTCBCur->OSTCBId].ResponseTime = Timing_INFO[OSTCBCur->OSTCBId].FinishTime - Timing_INFO[OSTCBCur->OSTCBId].ArriveTime;
-                    Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime = Timing_INFO[OSTCBCur->OSTCBId].ResponseTime - TaskParameter[OSTCBCur->OSTCBId - 1].TaskExecutionTime;
-                    Timing_INFO[OSTCBCur->OSTCBId].OSTimeDly = OSTCBCur->DeadLine - 1;
+                    Timing_INFO[OSTCBCur->OSTCBId].FinishTime       = OSTime;
+                    Timing_INFO[OSTCBCur->OSTCBId].ResponseTime     = Timing_INFO[OSTCBCur->OSTCBId].FinishTime - Timing_INFO[OSTCBCur->OSTCBId].ArriveTime;
+                    Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime   = Timing_INFO[OSTCBCur->OSTCBId].ResponseTime - TaskParameter[OSTCBCur->OSTCBId - 1].TaskExecutionTime;
+                    Timing_INFO[OSTCBCur->OSTCBId].OSTimeDly        = OSTCBCur->DeadLine - 1;
+
                 }
             }
             OS_EXIT_CRITICAL();
         }
+
         //倒數Deadline，把準備要enqueue的Task都先記錄起來
         EDF_TASK_WaitForEnqueueHEAD = NULL;
         EDF_TASK_WaitForEnqueueTAIL = NULL;
@@ -1066,16 +1068,18 @@ void  OSTimeTick (void)
             if (ptcb->DeadLine > 0) {
                 ptcb->DeadLine--;
                 if (ptcb->DeadLine == 0) {
-                    if (ptcb->RemainTime > 0) {
-                        printf("%2d\tMissDeadline\ttask(%2d)(%2d)\t------------\n", OSTime, OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
-                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                            fprintf(Output_fp, "%2d\tMissDeadline\ttask(%2d)(%2d)\t------------\n", OSTime, OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
-                            fclose(Output_fp);
+                    if (ptcb->OSTCBPrio != CUS_SERVER_PRIO) {
+                        if (ptcb->RemainTime > 0) {
+                            printf("%2d\tMissDeadline\ttask(%2d)(%2d)\t------------\n", OSTime, OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
+                            if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                                fprintf(Output_fp, "%2d\tMissDeadline\ttask(%2d)(%2d)\t------------\n", OSTime, OSTCBCur->OSTCBId, Timing_INFO[OSTCBCur->OSTCBId].FinishJobs);
+                                fclose(Output_fp);
+                            }
+                            exit(1);
                         }
-                        exit(1);
-                    }
-                    else {
-                        EDF_getEnqueueTasks(ptcb);
+                        else {
+                            EDF_getEnqueueTasks(ptcb);
+                        }
                     }
                 }
             }
@@ -1083,6 +1087,58 @@ void  OSTimeTick (void)
             OS_EXIT_CRITICAL();
         }
         /*M11102136 [PA2][PART-I]*/
+
+        //控制Aperiodic Job Arrive
+        Aperiodic_Task_Info* AperiodicIter = Aperiodic_TASK_HEAD;
+        while (AperiodicIter != NULL) {
+            OS_ENTER_CRITICAL();
+            if (AperiodicIter->ArriveTime > 0) {
+                AperiodicIter->ArriveTime--;
+                if (AperiodicIter->ArriveTime == 0) {
+                    if (OSTCBPrioTbl[CUS_SERVER_PRIO]->DeadLine > 0) {
+                        printf("%2d\tAperiodic job(%d) arrives. Do nothing.\n", OSTime, AperiodicIter->JobID);
+                        if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                            fprintf(Output_fp, "%2d\tAperiodic job(%d) arrives. Do nothing.\n", OSTime, AperiodicIter->JobID);
+                            fclose(Output_fp);
+                        }
+                    }
+                }
+            }
+            AperiodicIter = AperiodicIter->Next;
+            OS_EXIT_CRITICAL();
+        }
+        //如果CUS的Deadline = 0，且Aperiodic_TASK_HEAD->ArriveTime = 0，代表CUS又可以工作了
+        if (Aperiodic_TASK_HEAD != NULL) {
+            if (OSTCBPrioTbl[CUS_SERVER_PRIO]->DeadLine == 0 && Aperiodic_TASK_HEAD->ArriveTime == 0) {
+                //紀錄當前Aperiodic Job的AbsDeadline
+                CUS_INFO->CurAbsDeadline    = Aperiodic_TASK_HEAD->AbsolutelyDeadline;
+                CUS_INFO->CurOriArriveTime  = Aperiodic_TASK_HEAD->OriginalArriveTime;
+                //CUS_PTCB中的Deadline是經過計算得到的
+                TaskParameter[CUS_INFO->TaskID - 1].TaskPeriodic = (Aperiodic_TASK_HEAD->ExecutionTime) * (CUS_INFO->ServerSizeInversed);
+                TaskParameter[CUS_INFO->TaskID - 1].TaskExecutionTime = Aperiodic_TASK_HEAD->ExecutionTime;
+
+                OS_TCB* CUS_PTCB = OSTCBPrioTbl[CUS_SERVER_PRIO];
+                CUS_PTCB->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_SUSPEND;
+
+                EDF_getEnqueueTasks(CUS_PTCB);
+
+                if (CUS_INFO->CurOriArriveTime < OSTime) {
+                    printf("%2d\tAperiodic job(%d) sets CUS server's deadline as %2d.\n", OSTime, Aperiodic_TASK_HEAD->JobID, TaskParameter[CUS_INFO->TaskID - 1].TaskPeriodic + OSTime);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d\tAperiodic job(%d) sets CUS server's deadline as %2d.\n", OSTime, Aperiodic_TASK_HEAD->JobID, TaskParameter[CUS_INFO->TaskID - 1].TaskPeriodic + OSTime);
+                        fclose(Output_fp);
+                    }
+                }
+                else {
+                    printf("%2d\tAperiodic job(%d) arrives and sets CUS server's deadline as %2d.\n", OSTime, Aperiodic_TASK_HEAD->JobID, TaskParameter[CUS_INFO->TaskID - 1].TaskPeriodic + OSTime);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d\tAperiodic job(%d) arrives and sets CUS server's deadline as %2d.\n", OSTime, Aperiodic_TASK_HEAD->JobID, TaskParameter[CUS_INFO->TaskID - 1].TaskPeriodic + OSTime);
+                        fclose(Output_fp);
+                    }
+                }
+                Aperiodic_TASK_HEAD = Aperiodic_TASK_HEAD->Next;
+            }
+        }
 
         /*M11102136 [PA2][PART-I]*/
         /*每個Tick都在檢查有哪個task已經變成ready，要把他們對應的Ready Table位置設置成1
@@ -1125,7 +1181,9 @@ void  OSTimeTick (void)
             for (Iter = EDF_TASK_WaitForEnqueueHEAD; Iter != NULL; ) {
                 //紀錄Timing_INFO
                 Timing_INFO[Iter->ptcb->OSTCBId].ArriveTime = OSTime;
-
+                if (Iter->ptcb->OSTCBPrio == CUS_SERVER_PRIO) {
+                    Timing_INFO[Iter->ptcb->OSTCBId].ArriveTime = CUS_INFO->CurOriArriveTime;
+                }
                 //Enqueue
                 EDF_enqueue(Iter->ptcb);
                 deleteTarget = Iter;
@@ -1881,11 +1939,22 @@ void  OS_Sched (void)
                     fclose(Output_fp);
                 }
             }
-            printf("%2d\t%2d\t%2d\n", Timing_INFO[OSTCBCur->OSTCBId].ResponseTime, Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime, Timing_INFO[OSTCBCur->OSTCBId].OSTimeDly);
-            if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                fprintf(Output_fp, "%2d\t%2d\t%2d\n", Timing_INFO[OSTCBCur->OSTCBId].ResponseTime, Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime, Timing_INFO[OSTCBCur->OSTCBId].OSTimeDly);
-                fclose(Output_fp);
+            
+            if (OSTCBCur->OSTCBPrio == CUS_SERVER_PRIO) {
+                printf("%2d\t%2d\tN/A\n", Timing_INFO[OSTCBCur->OSTCBId].ResponseTime, Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d\t%2d\tN/A\n", Timing_INFO[OSTCBCur->OSTCBId].ResponseTime, Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime);
+                    fclose(Output_fp);
+                }
             }
+            else {
+                printf("%2d\t%2d\t%2d\n", Timing_INFO[OSTCBCur->OSTCBId].ResponseTime, Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime, Timing_INFO[OSTCBCur->OSTCBId].OSTimeDly);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d\t%2d\t%2d\n", Timing_INFO[OSTCBCur->OSTCBId].ResponseTime, Timing_INFO[OSTCBCur->OSTCBId].PreemptionTime, Timing_INFO[OSTCBCur->OSTCBId].OSTimeDly);
+                    fclose(Output_fp);
+                }
+            }
+            
             
 
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
@@ -2233,6 +2302,19 @@ INT8U  OS_TCBInit (INT8U    prio,
             ptcb->OSTCBDly       = ArriveTime;
             printf("task %2d is suspended\n", id);
         }
+        if (prio == CUS_SERVER_PRIO) {
+            CUS_INFO->JobCount = 0;
+            if (Aperiodic_TASK_HEAD->ArriveTime > 0) {  //如果Aperiodic Job 在 t = 0時沒有到達
+                ptcb->OSTCBStat = OS_STAT_SUSPEND;
+                ptcb->OSTCBDly = 99; //一開始CUS_SERVER_PRIO會被SUSPEND且不會醒來，
+                //每個Tick都去檢查是否有任何Aperiodic Job到達，如果有，
+                //則直接喚醒CUS => 把CUS的RemainTime,與計算後的CUS deadline紀錄進CUS的ptcb，然後串進EDF
+                printf("Aperiodic_TASK_HEAD->ArriveTime > 0, CUS %2d is suspended\n", id);
+            }
+            else {                                      //如果Aperiodic Job 在 t = 0時到達了
+                printf("Aperiodic_TASK_HEAD->ArriveTime = 0, CUS %2d is ready\n", id);
+            }
+        }
         /*M11102136 [PA2][PART-I]*/
 #if OS_TASK_CREATE_EXT_EN > 0u
         ptcb->OSTCBExtPtr        = pext;                   /* Store pointer to TCB extension           */
@@ -2328,7 +2410,22 @@ INT8U  OS_TCBInit (INT8U    prio,
             OS_TRACE_TASK_READY(ptcb);
             printf("IDLE task is created and ready\n");
         }
-        if (ArriveTime == 0 && prio != OS_TASK_IDLE_PRIO) {
+        if (prio == CUS_SERVER_PRIO) {
+            if (Aperiodic_TASK_HEAD->ArriveTime > 0) {  //如果Aperiodic_TASK_HEAD->ArriveTime > 0
+                printf("CUS_server is created and suspended\n");
+            }
+            else {                                      //如果Aperiodic_TASK_HEAD->ArriveTime = 0
+                //紀錄該Aperiodic Job的AbsDeadline
+                CUS_INFO->CurAbsDeadline                                = Aperiodic_TASK_HEAD->AbsolutelyDeadline;
+
+                //把CUS的TaskParameter設置成到達的Aperiodic Job的資訊，然後EDF_enqueue
+                //經過計算得到CUS ptcb用來進行EDF排程的Deadline
+                TaskParameter[CUS_INFO->TaskID - 1].TaskExecutionTime = Aperiodic_TASK_HEAD->ExecutionTime;
+                TaskParameter[CUS_INFO->TaskID - 1].TaskPeriodic = OSTime + (Aperiodic_TASK_HEAD->ExecutionTime) * (CUS_INFO->ServerSizeInversed);
+                EDF_enqueue(ptcb);
+            }
+        }
+        if (ArriveTime == 0 && prio != OS_TASK_IDLE_PRIO && prio != CUS_SERVER_PRIO) {
             OSRdyGrp |= ptcb->OSTCBBitY;
             OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
             OS_TRACE_TASK_READY(ptcb);
