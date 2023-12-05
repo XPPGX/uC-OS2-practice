@@ -90,7 +90,6 @@ int  main (void)
     CPU_INT08U  os_err;
 #endif
 
-
     CPU_IntInit();
 
     Mem_Init();                                                 /* Initialize Memory Managment Module                   */
