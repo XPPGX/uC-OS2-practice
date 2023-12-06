@@ -1,6 +1,6 @@
 ﻿  os_cpu_c.c
   os_core.c
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(994,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(999,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
   os_dbg_r.c
   os_flag.c
   os_mbox.c
@@ -19,8 +19,8 @@ D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.
 D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(106,14): warning C4047: '=': 'OS_STK **' 與 'int' 間接取值的層級不同
 D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(109,13): warning C4047: '=': 'RMS_TASK_INFO *' 與 'int' 間接取值的層級不同
 D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(110,12): warning C4047: '=': 'Time_Info *' 與 'int' 間接取值的層級不同
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(116,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
-D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(130,29): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(118,21): warning C4047: '=': 'OS_STK *' 與 'int' 間接取值的層級不同
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(134,29): warning C4244: '函式': 將 'INT16U' 轉換為 'INT8U'，由於類型不同，可能導致資料遺失
 D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\main.c(90,17): warning C4101: 'os_err': 未參考的區域變數
   正在產生程式碼...
   OS2.vcxproj -> D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\VS\Debug\OS2.exe

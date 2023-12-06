@@ -975,9 +975,14 @@ void  OSTimeTick (void)
     OSTime++;
 
     CompletionFlag = 0;//Init CompletionFlag per TimeTick
+#ifdef _RMS_RELEASE_
+    if (OSTime == 100) {
+        system("pause");
+    }
+#endif
 
 #ifdef _RMS_DEBUG_
-    if (OSTime == 31) {
+    if (OSTime == 100) {
         system("pause");
     }
 
@@ -1019,14 +1024,63 @@ void  OSTimeTick (void)
         }
 #endif
         /*M11102136 [PA1][PART-II]*/
-        //RemainTime 控制
+        //RemainTime 跟 ResourceTime 倒數計時
         if (OSTCBCur->OSTCBId < OS_TASK_IDLE_PRIO) {
+            //LockR1_RemainTime
+            if (RM_Info[OSTCBCur->OSTCBId - 1].LockR1_RemainTime > 0) {
+                RM_Info[OSTCBCur->OSTCBId - 1].LockR1_RemainTime--;
+                if (RM_Info[OSTCBCur->OSTCBId - 1].LockR1_RemainTime == 0) {
+                    printf("%2d\tLockResource\ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d\tLockResource\ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                        fclose(Output_fp);
+                    }
+                    Resource1 = OSTCBCur->OSTCBId;
+                }
+            }
+            //UnlockR1_RemainTime
+            if (RM_Info[OSTCBCur->OSTCBId - 1].UnlockR1_RemainTime > 0) {
+                RM_Info[OSTCBCur->OSTCBId - 1].UnlockR1_RemainTime--;
+                if (RM_Info[OSTCBCur->OSTCBId - 1].UnlockR1_RemainTime == 0) {
+                    printf("%2d\tUnlockResource\ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d\tUnlockResource\ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                        fclose(Output_fp);
+                    }
+                    Resource1 = -1; //-1代表Resource1被釋放
+                }
+            }
+            //LockR2_RemainTime
+            if (RM_Info[OSTCBCur->OSTCBId - 1].LockR2_RemainTime > 0) {
+                RM_Info[OSTCBCur->OSTCBId - 1].LockR2_RemainTime--;
+                if (RM_Info[OSTCBCur->OSTCBId - 1].LockR2_RemainTime == 0) {
+                    printf("%2d\tLockResource\ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d\tLockResource\ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                        fclose(Output_fp);
+                    }
+                    Resource2 = OSTCBCur->OSTCBId;
+                }
+            }
+            //UnlockR2_RemainTime
+            if (RM_Info[OSTCBCur->OSTCBId - 1].UnlockR2_RemainTime > 0) {
+                RM_Info[OSTCBCur->OSTCBId - 1].UnlockR2_RemainTime--;
+                if (RM_Info[OSTCBCur->OSTCBId - 1].UnlockR2_RemainTime == 0) {
+                    printf("%2d\tUnlockResource\ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d\tUnlockResource\ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                        fclose(Output_fp);
+                    }
+                    Resource2 = -1; //-1代表Resource2被釋放
+                }
+            }
+
+            //RemainTime 控制
             if (RM_Info[OSTCBCur->OSTCBId - 1].REMAIN_TIME > 0) {
                 RM_Info[OSTCBCur->OSTCBId - 1].REMAIN_TIME--;
 #ifdef _RMS_DEBUG_
                 printf("\tTask %2d RemainTime = %2d\n", OSTCBCur->OSTCBId, RM_Info[OSTCBCur->OSTCBId - 1].REMAIN_TIME);
 #endif
-
                 if (RM_Info[OSTCBCur->OSTCBId - 1].REMAIN_TIME == 0) {
                     //把執行完的 Task 從 RdyTbl 中移除
                     INT8U y;
@@ -1046,16 +1100,29 @@ void  OSTimeTick (void)
                     Record[OSTCBCur->OSTCBId - 1].ResponseTime = OSTime - Record[OSTCBCur->OSTCBId - 1].Arrive_At_OS_TimeTick;
                 }
             }
+            
+            //紀錄Timing
+            for (OS_TCB* tempTCB = OSTCBList; tempTCB->OSTCBPrio != OS_TASK_IDLE_PRIO; tempTCB = tempTCB->OSTCBNext) {
+                if (tempTCB != OSTCBCur && RM_Info[tempTCB->OSTCBId - 1].REMAIN_TIME > 0) {
+                    if (tempTCB->OSTCBPrio > OSTCBCur->OSTCBPrio) {     //OSTCBCur優先於tempTCB，PreemptedTime + 1
+                        Record[tempTCB->OSTCBId - 1].PreemptedTime++;
+                    }
+                    else if (tempTCB->OSTCBPrio < OSTCBCur->OSTCBPrio) {//tempTCB優先於OSTCBCur，BlockedTime + 1
+                        Record[tempTCB->OSTCBId - 1].BlockedTime++;
+                    }
+                }
+            }
         }
-        /*M11102136 [PA1][PART-II]*/
+        /*M11102136 [PA3][PART-I]*/
 
-        /*M11102136 [PA1][PART-II]*/
+        /*M11102136 [PA3][PART-I]*/
         //Deadline 控制
         ptcb = OSTCBList;
         while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {
             OS_ENTER_CRITICAL();
             if (RM_Info[ptcb->OSTCBId - 1].Deadline != 0) {
                 RM_Info[ptcb->OSTCBId - 1].Deadline--;
+
                 //紀錄Timing
                 if (CompletionFlag == 1) {
                     Record[ptcb->OSTCBId - 1].OSTimeDly = RM_Info[ptcb->OSTCBId - 1].Deadline;
@@ -1066,7 +1133,7 @@ void  OSTimeTick (void)
 #ifdef _RMS_DEBUG_
                         printf("\tTask %2d miss Deadline\n", ptcb->OSTCBId);
 #endif
-
+                        
                         printf("%2d\tMissDeadline\ttask(%2d)(%2d)\t-------------------\n", OSTime, ptcb->OSTCBId, Record[ptcb->OSTCBId - 1].Finished_Job);
                         if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
                             fprintf(Output_fp, "%2d\tMissDeadline\ttask(%2d)(%2d)\t-------------------\n", OSTime, ptcb->OSTCBId, Record[ptcb->OSTCBId - 1].Finished_Job);
@@ -1078,9 +1145,13 @@ void  OSTimeTick (void)
                         exit(1);
                     }
                     else {
-                        
                         RM_Info[ptcb->OSTCBId - 1].REMAIN_TIME          = TaskParameter[ptcb->OSTCBId - 1].TaskExecutionTime;
                         RM_Info[ptcb->OSTCBId - 1].Deadline             = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
+
+                        RM_Info[ptcb->OSTCBId - 1].LockR1_RemainTime    = TaskParameter[ptcb->OSTCBId - 1].LockR1Time;
+                        RM_Info[ptcb->OSTCBId - 1].UnlockR1_RemainTime  = TaskParameter[ptcb->OSTCBId - 1].UnlockR1Time;
+                        RM_Info[ptcb->OSTCBId - 1].LockR2_RemainTime    = TaskParameter[ptcb->OSTCBId - 1].LockR2Time;
+                        RM_Info[ptcb->OSTCBId - 1].UnlockR2_RemainTime  = TaskParameter[ptcb->OSTCBId - 1].UnlockR2Time;
 
                         //紀錄Timing
                         Record[ptcb->OSTCBId - 1].Arrive_At_OS_TimeTick = OSTime;
@@ -1122,9 +1193,13 @@ void  OSTimeTick (void)
                 ptcb->OSTCBDly--;                          /* Decrement nbr of ticks to end of delay       */
                 if (ptcb->OSTCBDly == 0u) {                /* Check for timeout                            */
                     /*M11102136 [PA1][PART-II]*/
-                    RM_Info[ptcb->OSTCBId - 1].REMAIN_TIME = TaskParameter[ptcb->OSTCBId - 1].TaskExecutionTime;
-                    RM_Info[ptcb->OSTCBId - 1].Deadline    = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
+                    RM_Info[ptcb->OSTCBId - 1].REMAIN_TIME          = TaskParameter[ptcb->OSTCBId - 1].TaskExecutionTime;
+                    RM_Info[ptcb->OSTCBId - 1].Deadline             = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
 
+                    RM_Info[ptcb->OSTCBId - 1].LockR1_RemainTime    = TaskParameter[ptcb->OSTCBId - 1].LockR1Time;
+                    RM_Info[ptcb->OSTCBId - 1].UnlockR1_RemainTime  = TaskParameter[ptcb->OSTCBId - 1].UnlockR1Time;
+                    RM_Info[ptcb->OSTCBId - 1].LockR2_RemainTime    = TaskParameter[ptcb->OSTCBId - 1].LockR2Time;
+                    RM_Info[ptcb->OSTCBId - 1].UnlockR2_RemainTime  = TaskParameter[ptcb->OSTCBId - 1].UnlockR2Time;
                     //紀錄Timing
                     Record[ptcb->OSTCBId - 1].Arrive_At_OS_TimeTick = OSTime;
 
@@ -1184,12 +1259,14 @@ void  OSTimeTick (void)
                 }
             }
 
-            printf("%2d\t%2d\t%2d\n", Record[OSTCBCur->OSTCBId - 1].ResponseTime, Record[OSTCBCur->OSTCBId - 1].PreemptionTime, Record[OSTCBCur->OSTCBId - 1].OSTimeDly);
+            printf("%2d\t%2d\t%2d\n", Record[OSTCBCur->OSTCBId - 1].ResponseTime, Record[OSTCBCur->OSTCBId - 1].BlockedTime, Record[OSTCBCur->OSTCBId - 1].PreemptedTime);
             if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                fprintf(Output_fp, "%2d\t%2d\t%2d\n", Record[OSTCBCur->OSTCBId - 1].ResponseTime, Record[OSTCBCur->OSTCBId - 1].PreemptionTime, Record[OSTCBCur->OSTCBId - 1].OSTimeDly);
+                fprintf(Output_fp, "%2d\t%2d\t%2d\n", Record[OSTCBCur->OSTCBId - 1].ResponseTime, Record[OSTCBCur->OSTCBId - 1].BlockedTime, Record[OSTCBCur->OSTCBId - 1].PreemptedTime);
                 fclose(Output_fp);
             }
             Record[OSTCBCur->OSTCBId - 1].Finished_Job++;
+            Record[OSTCBCur->OSTCBId - 1].BlockedTime   = 0;
+            Record[OSTCBCur->OSTCBId - 1].PreemptedTime = 0;
         }
         /*M11102136 [PA1][PART-II]*/
     }
@@ -1943,7 +2020,9 @@ static  void  OS_SchedNew (void)
 
 
     y             = OSUnMapTbl[OSRdyGrp];
-    OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
+    if (Resource1 == -1 && Resource2 == -1) {
+        OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
+    }
 #else                                            /* We support up to 256 tasks                         */
     INT8U     y;
     OS_PRIO  *ptbl;
@@ -2328,9 +2407,16 @@ INT8U  OS_TCBInit (INT8U    prio,
             OSRdyGrp               |= ptcb->OSTCBBitY;         /* Make task ready to run                   */
             OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
             if (id < OS_TASK_IDLE_PRIO) {
-                RM_Info[id - 1].REMAIN_TIME = TaskParameter[id - 1].TaskExecutionTime;
-                RM_Info[id - 1].Deadline    = TaskParameter[id - 1].TaskPeriodic;
+                RM_Info[id - 1].REMAIN_TIME         = TaskParameter[id - 1].TaskExecutionTime;
+                RM_Info[id - 1].Deadline            = TaskParameter[id - 1].TaskPeriodic;
 
+                RM_Info[id - 1].LockR1_RemainTime   = TaskParameter[id - 1].LockR1Time;
+                RM_Info[id - 1].UnlockR1_RemainTime = TaskParameter[id - 1].UnlockR1Time;
+                RM_Info[id - 1].LockR2_RemainTime   = TaskParameter[id - 1].LockR2Time;
+                RM_Info[id - 1].UnlockR2_RemainTime = TaskParameter[id - 1].UnlockR2Time;
+
+
+                //紀錄Timing
                 Record[id - 1].Arrive_At_OS_TimeTick = OSTime;
                 printf("Time %2d, Task %2d ready\n", OSTime, id);
             }

@@ -63,13 +63,13 @@ extern "C" {
 *********************************************************************************************************
 */
 /*End time for the simulation*/
-#define SYSTEM_END_TIME 30
+#define SYSTEM_END_TIME 100
 /*Input File*/
     FILE* fp;
 #define INPUT_FILE_NAME "./TaskSet.txt"
 #define OUTPUT_FILE_NAME "./Output.txt"
 #define MAX 20              //Task maximum number
-#define INFO 4              //information of task
+#define INFO 10              //information of task
 /*Input File*/
 
 /*Output File*/
@@ -85,6 +85,11 @@ typedef struct task_para_set {
     INT16U TaskPeriodic;
     INT16U TaskNumber;
     INT16U TaskPriority;
+
+    INT16U LockR1Time;
+    INT16U UnlockR1Time;
+    INT16U LockR2Time;
+    INT16U UnlockR2Time;
 }task_para_set;
 
 int TASK_NUMBER; //Number of the input tasks
@@ -1505,12 +1510,17 @@ void          OSCtxSw                 (void);
 
 void OutFileInit(void);
 void InputFile(void);
-
 /*M11102136 [PA1][PART-II]*/
 //#define _RMS_DEBUG_
+//#define _RMS_RELEASE_
 typedef struct rms_task_info{
     int REMAIN_TIME;
     int Deadline;
+
+    int LockR1_RemainTime;  //如果變成0，代表R1需要被lock
+    int UnlockR1_RemainTime;//如果變成0，代表R1需要被unlock
+    int LockR2_RemainTime;  //如果變成0，代表R2需要被lock
+    int UnlockR2_RemainTime;//如果變成0，代表R2需要被unlock
 }RMS_TASK_INFO;
 
 typedef struct time_info {
@@ -1519,7 +1529,14 @@ typedef struct time_info {
     int ResponseTime;
     int PreemptionTime;
     int OSTimeDly;
+
+    int BlockedTime;  
+    int PreemptedTime;
 }Time_Info;
+
+int Resource1;  //如果task1正在使用，則Resource1 = 1；如果task2使用則Resource1 = 2；如果沒人使用則Resource1 = -1
+int Resource2;  //如果task1正在使用，則Resource2 = 1；如果task2使用則Resource2 = 2；如果沒人使用則Resource2 = -1
+
 
 OS_EXT RMS_TASK_INFO* RM_Info;
 OS_EXT Time_Info* Record;

@@ -137,6 +137,18 @@ void InputFile() {
             else if (i == 3) {
                 TaskParameter[j].TaskPeriodic = TaskInfo[i];
             }
+            else if (i == 4) {
+                TaskParameter[j].LockR1Time = TaskInfo[i];
+            }
+            else if (i == 5) {
+                TaskParameter[j].UnlockR1Time = TaskInfo[i];
+            }
+            else if (i == 6) {
+                TaskParameter[j].LockR2Time = TaskInfo[i];
+            }
+            else if (i == 7) {
+                TaskParameter[j].UnlockR2Time = TaskInfo[i];
+            }
             i++;
         }
         /*Initial Priority*/
@@ -146,6 +158,13 @@ void InputFile() {
         j++;
     }
     fclose(fp);
+    
+    //檢查TaskParameter的內容
+    for (int i = 0; i < TASK_NUMBER; i++) {
+        printf("Task[%d] = {%2d, %2d, %2d, %2d, %2d, %2d, %2d, %2d}\n", TaskParameter[i].TaskID, 
+            TaskParameter[i].TaskID, TaskParameter[i].TaskArriveTime, TaskParameter[i].TaskExecutionTime, TaskParameter[i].TaskPeriodic,
+            TaskParameter[i].LockR1Time, TaskParameter[i].UnlockR1Time, TaskParameter[i].LockR2Time, TaskParameter[i].UnlockR2Time);
+    }
     /*read file*/
 }
 /*

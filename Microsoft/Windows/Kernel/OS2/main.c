@@ -108,6 +108,8 @@ int  main (void)
     /*M11102136 [PA1][PART-II]*/
     RM_Info = malloc(TASK_NUMBER * sizeof(RMS_TASK_INFO));
     Record = malloc(TASK_NUMBER * sizeof(Time_Info));
+    Resource1 = -1; //初始化Resource
+    Resource2 = -1; //初始化Resource
     /*M11102136 [PA1][PART-II]*/
 
     /*for each pointer, allocate storage for an array of ints*/
@@ -124,6 +126,8 @@ int  main (void)
         Record[n].PreemptionTime        = 0;
         Record[n].OSTimeDly             = 0;
 
+        Record[n].BlockedTime          = 0;
+        Record[n].PreemptedTime         = 0;
         OSTaskCreateExt(task,
             &TaskParameter[n],
             &Task_STK[n][TASK_STACKSIZE - 1],
