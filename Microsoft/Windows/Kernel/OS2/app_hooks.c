@@ -115,7 +115,12 @@ void InputFile() {
     char* pTmp = NULL;
     int TaskInfo[INFO], i, j = 0;
     TASK_NUMBER = 0;
-    
+    //初始化order
+    int periodOrder[100];
+    for (int i = 0; i < 100; i++) {
+        periodOrder[i] = -1;
+    }
+
     while (!feof(fp)) {
         i = 0;
         memset(str, 0, sizeof(str));
@@ -151,14 +156,22 @@ void InputFile() {
             }
             i++;
         }
+
         /*Initial Priority*/
-        /*M11102136 [PA1][PART-II]*/
-        TaskParameter[j].TaskPriority = TaskParameter[j].TaskPeriodic; //just an example
-        /*M11102136 [PA1][PART-II]*/
+        periodOrder[TaskParameter[j].TaskPeriodic] = TaskParameter[j].TaskID;
+        //TaskParameter[j].TaskPriority = TaskParameter[j].TaskPeriodic; //just an example
         j++;
     }
     fclose(fp);
-    
+    int assignPrio = 1;
+    for (int i = 0; i < 100; i++) {
+        if (periodOrder[i] != -1) {
+            TaskParameter[periodOrder[i] - 1].TaskPriority = assignPrio;
+            assignPrio++;
+        }
+    }
+
+
     //檢查TaskParameter的內容
     for (int i = 0; i < TASK_NUMBER; i++) {
         printf("Task[%d] = {%2d, %2d, %2d, %2d, %2d, %2d, %2d, %2d}\n", TaskParameter[i].TaskID, 
