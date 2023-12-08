@@ -711,7 +711,7 @@ void  OSIntExit (void)
                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
                 if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
 #if OS_TASK_PROFILE_EN > 0u
-                    /*M11102136 [PA1][PART-II]*/
+                    /*M11102136 [PA3][PART-I]*/
                     if (OSPrioCur == OS_TASK_IDLE_PRIO) {
                         printf("%2d\tPreemption\ttask(%2d)\ttask(%2d)(%2d)\n", OSTime, OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBId, Record[OSTCBHighRdy->OSTCBId - 1].Finished_Job);
                         if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
@@ -728,7 +728,7 @@ void  OSIntExit (void)
                             }
                         }
                     }
-                    /*M11102136 [PA1][PART-II]*/
+                    /*M11102136 [PA3][PART-I]*/
                     
                     OSTCBCur->OSTCBCtxSwCtr++;
 #endif
@@ -1178,7 +1178,7 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;
             OS_EXIT_CRITICAL();
         }
-        /*M11102136 [PA1][PART-II]*/
+        /*M11102136 [PA3][PART-I]*/
 
         /*每個Tick都在檢查有哪個task已經變成ready，要把他們對應的Ready Table位置設置成1
         每個Tick都會掃過所有TCB*/
@@ -1192,7 +1192,7 @@ void  OSTimeTick (void)
             if (ptcb->OSTCBDly != 0u) {                    /* No, Delayed or waiting for event with TO     */
                 ptcb->OSTCBDly--;                          /* Decrement nbr of ticks to end of delay       */
                 if (ptcb->OSTCBDly == 0u) {                /* Check for timeout                            */
-                    /*M11102136 [PA1][PART-II]*/
+                    /*M11102136 [PA3][PART-I]*/
                     RM_Info[ptcb->OSTCBId - 1].REMAIN_TIME          = TaskParameter[ptcb->OSTCBId - 1].TaskExecutionTime;
                     RM_Info[ptcb->OSTCBId - 1].Deadline             = TaskParameter[ptcb->OSTCBId - 1].TaskPeriodic;
 
@@ -1204,7 +1204,7 @@ void  OSTimeTick (void)
                     Record[ptcb->OSTCBId - 1].Arrive_At_OS_TimeTick = OSTime;
 
                     //一開始的Arrive會用到Delay Time，之後的Job arrive都由deadline控制。
-                    /*M11102136 [PA1][PART-II]*/
+                    /*M11102136 [PA3][PART-I]*/
 #ifdef _RMS_DEBUG_
                     printf("\tTime : %2d, Task %2d ready\n", OSTime, ptcb->OSTCBId);
 #endif
@@ -1222,14 +1222,14 @@ void  OSTimeTick (void)
                         OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
                         OS_TRACE_TASK_READY(ptcb);
                     }
-                    /*M11102136 [PA1][PART-II]*/
+                    /*M11102136 [PA3][PART-I]*/
                 }
             }
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
 
-        /*M11102136 [PA1][PART-II]*/
+        /*M11102136 [PA3][PART-I]*/
         if (CompletionFlag == 1) {
             //紀錄Timing
             Record[OSTCBCur->OSTCBId - 1].PreemptionTime = Record[OSTCBCur->OSTCBId - 1].ResponseTime - TaskParameter[OSTCBCur->OSTCBId - 1].TaskExecutionTime;
@@ -1268,7 +1268,7 @@ void  OSTimeTick (void)
             Record[OSTCBCur->OSTCBId - 1].BlockedTime   = 0;
             Record[OSTCBCur->OSTCBId - 1].PreemptedTime = 0;
         }
-        /*M11102136 [PA1][PART-II]*/
+        /*M11102136 [PA3][PART-I]*/
     }
 }
 

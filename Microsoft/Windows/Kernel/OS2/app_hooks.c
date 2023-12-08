@@ -142,6 +142,7 @@ void InputFile() {
             else if (i == 3) {
                 TaskParameter[j].TaskPeriodic = TaskInfo[i];
             }
+    /*M11102136 [PA3][PART-I]*/
             else if (i == 4) {
                 TaskParameter[j].LockR1Time = TaskInfo[i];
             }
@@ -170,7 +171,7 @@ void InputFile() {
             assignPrio++;
         }
     }
-
+    /*M11102136 [PA3][PART-I]*/
 
     //檢查TaskParameter的內容
     for (int i = 0; i < TASK_NUMBER; i++) {

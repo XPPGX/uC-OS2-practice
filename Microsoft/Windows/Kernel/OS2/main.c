@@ -105,18 +105,18 @@ int  main (void)
     /*Dynamic Create the Stack size*/
     Task_STK = malloc(TASK_NUMBER * sizeof(int*));
 
-    /*M11102136 [PA1][PART-II]*/
+    /*M11102136 [PA3][PART-I]*/
     RM_Info = malloc(TASK_NUMBER * sizeof(RMS_TASK_INFO));
     Record = malloc(TASK_NUMBER * sizeof(Time_Info));
     Resource1 = -1; //初始化Resource
     Resource2 = -1; //初始化Resource
-    /*M11102136 [PA1][PART-II]*/
-
+    /*M11102136 [PA3][PART-I]*/
+    
     /*for each pointer, allocate storage for an array of ints*/
     int n;
     for (n = 0; n < TASK_NUMBER; n++) {
         Task_STK[n] = malloc(TASK_STACKSIZE * sizeof(int));
-        /*M11102136 [PA1][PART-II]*/
+        /*M11102136 [PA3][PART-I]*/
         RM_Info[n].REMAIN_TIME          = 0;
         RM_Info[n].Deadline             = 0;
 
@@ -126,7 +126,7 @@ int  main (void)
         Record[n].PreemptionTime        = 0;
         Record[n].OSTimeDly             = 0;
 
-        Record[n].BlockedTime          = 0;
+        Record[n].BlockedTime           = 0;
         Record[n].PreemptedTime         = 0;
         OSTaskCreateExt(task,
             &TaskParameter[n],
@@ -137,7 +137,7 @@ int  main (void)
             TASK_STACKSIZE,
             &TaskParameter[n],
             (OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-        /*M11102136 [PA1][PART-II]*/
+        /*M11102136 [PA3][PART-I]*/
     }
 
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II)   */
