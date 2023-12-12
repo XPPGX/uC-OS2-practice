@@ -108,8 +108,8 @@ int  main (void)
     /*M11102136 [PA3][PART-I]*/
     RM_Info = malloc(TASK_NUMBER * sizeof(RMS_TASK_INFO));
     Record = malloc(TASK_NUMBER * sizeof(Time_Info));
-    Resource1 = -1; //初始化Resource
-    Resource2 = -1; //初始化Resource
+    Resource1_UsedTaskID = -1; //初始化Resource
+    Resource2_UsedTaskID = -1; //初始化Resource
     /*M11102136 [PA3][PART-I]*/
     
     /*for each pointer, allocate storage for an array of ints*/

@@ -1,5 +1,17 @@
-﻿  os_core.c
+﻿  os_cpu_c.c
+  os_core.c
 D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_core.c(999,13): warning C4013: 'exit' 未定義; 假設 extern 傳回整數
+  os_dbg_r.c
+  os_flag.c
+  os_mbox.c
+  os_mem.c
+  os_mutex.c
+  os_q.c
+  os_sem.c
+  os_task.c
+  os_time.c
+D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Micrium\Software\uCOS-II\Source\os_time.c(57,16): warning C4101: 'y': 未參考的區域變數
+  os_tmr.c
   app_hooks.c
 D:\NTUST\碩二上\Embeded OS\uC-OS2-practice\Microsoft\Windows\Kernel\OS2\app_hooks.c(130,27): warning C4013: 'atoi' 未定義; 假設 extern 傳回整數
   main.c

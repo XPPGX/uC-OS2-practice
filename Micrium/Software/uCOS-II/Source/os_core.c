@@ -1030,48 +1030,52 @@ void  OSTimeTick (void)
             if (RM_Info[OSTCBCur->OSTCBId - 1].LockR1_RemainTime > 0) {
                 RM_Info[OSTCBCur->OSTCBId - 1].LockR1_RemainTime--;
                 if (RM_Info[OSTCBCur->OSTCBId - 1].LockR1_RemainTime == 0) {
-                    printf("%2d\tLockResource\ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                    printf("%2d\tLockResource\ttask(%2d)(%2d)\tR1\t\t", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
                     if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                        fprintf(Output_fp, "%2d\tLockResource\ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                        fprintf(Output_fp, "%2d\tLockResource\ttask(%2d)(%2d)\tR1\t\t", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
                         fclose(Output_fp);
                     }
-                    Resource1 = OSTCBCur->OSTCBId;
+                    printPRIOchange(1, 1);
+                    Resource1_UsedTaskID = OSTCBCur->OSTCBId;
                 }
             }
             //UnlockR1_RemainTime
             if (RM_Info[OSTCBCur->OSTCBId - 1].UnlockR1_RemainTime > 0) {
                 RM_Info[OSTCBCur->OSTCBId - 1].UnlockR1_RemainTime--;
                 if (RM_Info[OSTCBCur->OSTCBId - 1].UnlockR1_RemainTime == 0) {
-                    printf("%2d\tUnlockResource\ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                    printf("%2d\tUnlockResource\ttask(%2d)(%2d)\tR1\t\t", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
                     if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                        fprintf(Output_fp, "%2d\tUnlockResource\ttask(%2d)(%2d)\tR1\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                        fprintf(Output_fp, "%2d\tUnlockResource\ttask(%2d)(%2d)\tR1\t\t", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
                         fclose(Output_fp);
                     }
-                    Resource1 = -1; //-1代表Resource1被釋放
+                    printPRIOchange(1, 0);
+                    Resource1_UsedTaskID = -1; //-1代表Resource1被釋放
                 }
             }
             //LockR2_RemainTime
             if (RM_Info[OSTCBCur->OSTCBId - 1].LockR2_RemainTime > 0) {
                 RM_Info[OSTCBCur->OSTCBId - 1].LockR2_RemainTime--;
                 if (RM_Info[OSTCBCur->OSTCBId - 1].LockR2_RemainTime == 0) {
-                    printf("%2d\tLockResource\ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                    printf("%2d\tLockResource\ttask(%2d)(%2d)\tR2\t\t", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
                     if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                        fprintf(Output_fp, "%2d\tLockResource\ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                        fprintf(Output_fp, "%2d\tLockResource\ttask(%2d)(%2d)\tR2\t\t", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
                         fclose(Output_fp);
                     }
-                    Resource2 = OSTCBCur->OSTCBId;
+                    printPRIOchange(2, 1);
+                    Resource2_UsedTaskID = OSTCBCur->OSTCBId;
                 }
             }
             //UnlockR2_RemainTime
             if (RM_Info[OSTCBCur->OSTCBId - 1].UnlockR2_RemainTime > 0) {
                 RM_Info[OSTCBCur->OSTCBId - 1].UnlockR2_RemainTime--;
                 if (RM_Info[OSTCBCur->OSTCBId - 1].UnlockR2_RemainTime == 0) {
-                    printf("%2d\tUnlockResource\ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                    printf("%2d\tUnlockResource\ttask(%2d)(%2d)\tR2\t\t", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
                     if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
-                        fprintf(Output_fp, "%2d\tUnlockResource\ttask(%2d)(%2d)\tR2\n", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
+                        fprintf(Output_fp, "%2d\tUnlockResource\ttask(%2d)(%2d)\tR2\t\t", OSTime, OSTCBCur->OSTCBId, Record[OSTCBCur->OSTCBId - 1].Finished_Job);
                         fclose(Output_fp);
                     }
-                    Resource2 = -1; //-1代表Resource2被釋放
+                    printPRIOchange(2, 0);
+                    Resource2_UsedTaskID = -1; //-1代表Resource2被釋放
                 }
             }
 
@@ -2018,11 +2022,52 @@ static  void  OS_SchedNew (void)
 #if OS_LOWEST_PRIO <= 63u                        /* See if we support up to 64 tasks                   */
     INT8U   y;
 
-
-    y             = OSUnMapTbl[OSRdyGrp];
-    if (Resource1 == -1 && Resource2 == -1) {
-        OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
+    //若R1,R2正在被使用，則把R1, R2的ceiling考慮進來(加進OSRdyTbl)
+    OS_ENTER_CRITICAL();
+    if (Resource1_UsedTaskID != -1) {
+        R1_PutInRdyTbl();
     }
+    if (Resource2_UsedTaskID != -1) {
+        R2_PutInRdyTbl();
+    }
+    OS_EXIT_CRITICAL();
+
+    //找出最優先的Priority
+    y             = OSUnMapTbl[OSRdyGrp];
+    OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
+
+    //把R1, R2的ceiling priority從RdyTbl移除
+    OS_ENTER_CRITICAL();
+    if (Resource1_UsedTaskID != -1) {
+        R1_TakeFromRdyTbl();
+    }
+    if (Resource2_UsedTaskID != -1) {
+        R2_TakeFromRdyTbl();
+    }
+    OS_EXIT_CRITICAL();
+
+    OS_TCB* TempTCB_Ptr;
+    if (OSPrioHighRdy == Resource1_ceiling) {
+        for (TempTCB_Ptr = OSTCBList; TempTCB_Ptr->OSTCBPrio != OS_TASK_IDLE_PRIO; TempTCB_Ptr = TempTCB_Ptr->OSTCBNext) {
+            if (Resource1_UsedTaskID == TempTCB_Ptr->OSTCBId) {
+                OSPrioHighRdy = TempTCB_Ptr->OSTCBPrio;
+                break;
+            }
+        }
+    }
+    else if (OSPrioHighRdy == Resource2_ceiling) {
+        for (TempTCB_Ptr = OSTCBList; TempTCB_Ptr->OSTCBPrio != OS_TASK_IDLE_PRIO; TempTCB_Ptr = TempTCB_Ptr->OSTCBNext) {
+            if (Resource2_UsedTaskID == TempTCB_Ptr->OSTCBId) {
+                OSPrioHighRdy = TempTCB_Ptr->OSTCBPrio;
+                break;
+            }
+        }
+    }
+
+
+    //if (Resource1_UsedTaskID == -1 && Resource2_UsedTaskID == -1) {
+    //    OSPrioHighRdy = (INT8U)((y << 3u) + OSUnMapTbl[OSRdyTbl[y]]);
+    //}
 #else                                            /* We support up to 256 tasks                         */
     INT8U     y;
     OS_PRIO  *ptbl;
@@ -2433,4 +2478,180 @@ INT8U  OS_TCBInit (INT8U    prio,
     }
     OS_EXIT_CRITICAL();
     return (OS_ERR_TASK_NO_MORE_TCB);
+}
+
+void R1_PutInRdyTbl() {
+    INT8U Y = (INT8U)(Resource1_ceiling >> 3u);
+    INT8U X = (INT8U)(Resource1_ceiling & 0x07u);
+    
+    OS_PRIO bity = (OS_PRIO)(1uL << Y);
+    OS_PRIO bitx = (OS_PRIO)(1uL << X);
+
+    OSRdyGrp    |= bity;
+    OSRdyTbl[Y] |= bitx;
+
+    //printf("After setting R1 ceiling in RdyTbl\n");
+    //for (int i = 0; i < 8; i++) {
+    //    printf("OSRdyTbl[%d] = %x\n", i, OSRdyTbl[i]);
+    //}
+}
+
+void R1_TakeFromRdyTbl() {
+    INT8U Y = (INT8U)(Resource1_ceiling >> 3u);
+    INT8U X = (INT8U)(Resource1_ceiling & 0x07u);
+
+    OS_PRIO bity = (OS_PRIO)(1uL << Y);
+    OS_PRIO bitx = (OS_PRIO)(1uL << X);
+    
+    OSRdyTbl[Y] &= (OS_PRIO)~bitx;
+    if (OSRdyTbl[Y] == 0) {
+        OSRdyGrp &= (OS_PRIO)~bity;
+    }
+    //printf("After taking R1 away from RdyTbl\n");
+    //for (int i = 0; i < 8; i++) {
+    //    printf("OSRdyTbl[%d] = %x\n", i, OSRdyTbl[i]);
+    //}
+}
+
+void R2_PutInRdyTbl() {
+    INT8U Y = (INT8U)(Resource2_ceiling >> 3u);
+    INT8U X = (INT8U)(Resource2_ceiling & 0x07u);
+
+    OS_PRIO bity = (OS_PRIO)(1uL << Y);
+    OS_PRIO bitx = (OS_PRIO)(1uL << X);
+
+    OSRdyGrp |= bity;
+    OSRdyTbl[Y] |= bitx;
+
+    //printf("After setting R2 ceiling in RdyTbl\n");
+    //for (int i = 0; i < 8; i++) {
+    //    printf("OSRdyTbl[%d] = %x\n", i, OSRdyTbl[i]);
+    //}
+}
+
+void R2_TakeFromRdyTbl() {
+    INT8U Y = (INT8U)(Resource2_ceiling >> 3u);
+    INT8U X = (INT8U)(Resource2_ceiling & 0x07u);
+
+    OS_PRIO bity = (OS_PRIO)(1uL << Y);
+    OS_PRIO bitx = (OS_PRIO)(1uL << X);
+
+    OSRdyTbl[Y] &= (OS_PRIO)~bitx;
+    if (OSRdyTbl[Y] == 0) {
+        OSRdyGrp &= (OS_PRIO)~bity;
+    }
+    //printf("After taking R2 away from RdyTbl\n");
+    //for (int i = 0; i < 8; i++) {
+    //    printf("OSRdyTbl[%d] = %x\n", i, OSRdyTbl[i]);
+    //}
+}
+
+void printPRIOchange(int ResourceIndex, int mode) {
+    int currentTaskPrio = OSTCBCur->OSTCBPrio;
+    
+    if (ResourceIndex == 1) { //對Resource1
+        if (mode == 0) {//Unlocking R1
+            if (Resource2_UsedTaskID == OSTCBCur->OSTCBId) {//R2被OSTCBCur拿著
+                if (Resource2_ceiling > Resource1_ceiling) {//R1優先於R2
+                    printf("%2d to %2d\n", Resource1_ceiling, Resource2_ceiling);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d to %2d\n", Resource1_ceiling, Resource2_ceiling);
+                        fclose(Output_fp);
+                    }
+                }
+                else {                                      //R2優先於R1
+                    printf("%2d to %2d\n", Resource2_ceiling, Resource2_ceiling);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d to %2d\n", Resource2_ceiling, Resource2_ceiling);
+                        fclose(Output_fp);
+                    }
+                }
+            }
+            else {                                          //R2沒有被OSTCBCur拿著
+                printf("%2d to %2d\n", Resource1_ceiling, currentTaskPrio);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d to %2d\n", Resource1_ceiling, currentTaskPrio);
+                    fclose(Output_fp);
+                }
+            }
+        }
+        else {          //Locking R1
+            if (Resource2_UsedTaskID == OSTCBCur->OSTCBId) {//R2被OSTCBCur拿著
+                if (Resource2_ceiling > Resource1_ceiling) {//R1優先於R2
+                    printf("%2d to %2d\n", Resource2_ceiling, Resource1_ceiling);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d to %2d\n", Resource2_ceiling, Resource1_ceiling);
+                        fclose(Output_fp);
+                    }
+                }
+                else {                                      //R2優先於R1
+                    printf("%2d to %2d\n", Resource2_ceiling, Resource2_ceiling);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d to %2d\n", Resource2_ceiling, Resource2_ceiling);
+                        fclose(Output_fp);
+                    }
+                }
+            }
+            else {                                          //R2沒有被OSTCBCur拿著
+                printf("%2d to %2d\n", currentTaskPrio, Resource1_ceiling);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d to %2d\n", currentTaskPrio, Resource1_ceiling);
+                    fclose(Output_fp);
+                }
+            }
+        }
+    }
+    else {                  //對Resource2
+        if (mode == 0) {//Unlocking R2 
+            if (Resource1_UsedTaskID == OSTCBCur->OSTCBId) {//R1被OSTCBCur拿著
+                if (Resource1_ceiling > Resource2_ceiling) {//R2優先於R1
+                    printf("%2d to %2d\n", Resource2_ceiling, Resource1_ceiling);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d to %2d\n", Resource2_ceiling, Resource1_ceiling);
+                        fclose(Output_fp);
+                    }
+                }
+                else {                                      //R1優先於R2
+                    printf("%2d to %2d\n", Resource1_ceiling, Resource1_ceiling);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d to %2d\n", Resource1_ceiling, Resource1_ceiling);
+                        fclose(Output_fp);
+                    }
+                }
+            }
+            else {                                          //R1沒有被OSTCBCur拿著
+                printf("%2d to %2d\n", Resource2_ceiling, currentTaskPrio);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d to %2d\n", Resource2_ceiling, currentTaskPrio);
+                    fclose(Output_fp);
+                }
+            }
+        }
+        else {          //Locking R2
+            if (Resource1_UsedTaskID == OSTCBCur->OSTCBId) {//R1被OSTCBCur拿著
+                if (Resource1_ceiling > Resource2_ceiling) {//R2優先於R1
+                    printf("%2d to %2d\n", Resource1_ceiling, Resource2_ceiling);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d to %2d\n", Resource1_ceiling, Resource2_ceiling);
+                        fclose(Output_fp);
+                    }
+                }
+                else {                                      //R1優先於R2
+                    printf("%2d to %2d\n", Resource1_ceiling, Resource1_ceiling);
+                    if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                        fprintf(Output_fp, "%2d to %2d\n", Resource1_ceiling, Resource1_ceiling);
+                        fclose(Output_fp);
+                    }
+                }
+            }
+            else {
+                printf("%2d to %2d\n", currentTaskPrio, Resource2_ceiling);
+                if ((Output_err = fopen_s(&Output_fp, "./Output.txt", "a")) == 0) {
+                    fprintf(Output_fp, "%2d to %2d\n", currentTaskPrio, Resource2_ceiling);
+                    fclose(Output_fp);
+                }
+            }
+        }
+    }
+    
 }

@@ -1534,13 +1534,22 @@ typedef struct time_info {
     int PreemptedTime;
 }Time_Info;
 
-int Resource1;  //如果task1正在使用，則Resource1 = 1；如果task2使用則Resource1 = 2；如果沒人使用則Resource1 = -1
-int Resource2;  //如果task1正在使用，則Resource2 = 1；如果task2使用則Resource2 = 2；如果沒人使用則Resource2 = -1
-
+int Resource1_UsedTaskID;  //如果task1正在使用，則Resource1 = 1；如果task2使用則Resource1 = 2；如果沒人使用則Resource1 = -1
+int Resource2_UsedTaskID;  //如果task1正在使用，則Resource2 = 1；如果task2使用則Resource2 = 2；如果沒人使用則Resource2 = -1
+int Resource1_ceiling;  //紀錄R1的ceiling
+int Resource2_ceiling;  //紀錄R2的ceiling
 
 OS_EXT RMS_TASK_INFO* RM_Info;
 OS_EXT Time_Info* Record;
 OS_EXT int CompletionFlag;
+
+OS_EXT void R1_PutInRdyTbl();
+OS_EXT void R1_TakeFromRdyTbl();
+OS_EXT void R2_PutInRdyTbl();
+OS_EXT void R2_TakeFromRdyTbl();
+
+OS_EXT void printPRIOchange(int ResourceIndex, int mode);
+
 /*M11102136 [PA1][PART-II]*/
 
 /*
