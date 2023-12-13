@@ -142,7 +142,7 @@ void InputFile() {
             else if (i == 3) {
                 TaskParameter[j].TaskPeriodic = TaskInfo[i];
             }
-    /*M11102136 [PA3][PART-I]*/
+    /*M11102136 [PA3][PART-II]*/
             else if (i == 4) {
                 TaskParameter[j].LockR1Time = TaskInfo[i];
             }
@@ -171,9 +171,10 @@ void InputFile() {
             assignPrio = assignPrio + 3;
         }
     }
-    /*M11102136 [PA3][PART-I]*/
+    /*M11102136 [PA3][PART-II]*/
     
     //檢查TaskParameter的內容
+    /*M11102136 [PA3][PART-II]*/
     int HighPrioTaskForR1 = -1; //紀錄R1的最高使用者的TaskID
     int HighPrioTaskForR2 = -1; //紀錄R2的最高使用者的TaskID
     for (int i = 0; i < TASK_NUMBER; i++) {
@@ -195,6 +196,7 @@ void InputFile() {
     Resource2_ceiling = TaskParameter[HighPrioTaskForR2 - 1].TaskPriority - 2;
     printf("Ceil_Prio(R1) = %2d\n", Resource1_ceiling);
     printf("Ceil_Prio(R2) = %2d\n", Resource2_ceiling);
+    /*M11102136 [PA3][PART-II]*/
     /*read file*/
 }
 /*
